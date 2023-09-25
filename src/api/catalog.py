@@ -4,6 +4,10 @@ from src import database as db
 
 router = APIRouter()
 
+with db.engine.begin() as connection:
+        result = connection.execute("SELECT * FROM global_inventory")
+        for row in result:
+            print(row)
 
 @router.get("/catalog/", tags=["catalog"])
 def get_catalog():
