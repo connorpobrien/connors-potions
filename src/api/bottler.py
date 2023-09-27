@@ -5,6 +5,9 @@ from src.api import auth
 import sqlalchemy
 from src import database as db
 
+with db.engine.begin() as connection:
+        result = connection.execute("SELECT * FROM global_inventory")
+
 router = APIRouter(
     prefix="/bottler",
     tags=["bottler"],
@@ -41,8 +44,4 @@ def get_bottle_plan():
                 "quantity": 5,
             }
         ]
-
-with db.engine.begin() as connection:
-        result = connection.execute("SELECT * FROM global_inventory")
-
 

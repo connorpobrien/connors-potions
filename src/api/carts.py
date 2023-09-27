@@ -4,12 +4,14 @@ from src.api import auth
 import sqlalchemy
 from src import database as db
 
+with db.engine.begin() as connection:
+        result = connection.execute("SELECT * FROM global_inventory")
+
 router = APIRouter(
     prefix="/carts",
     tags=["cart"],
     dependencies=[Depends(auth.get_api_key)],
 )
-
 
 class NewCart(BaseModel):
     customer: str
@@ -48,5 +50,3 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
 
     return {"total_potions_bought": 1, "total_gold_paid": 50}
 
-with db.engine.begin() as connection:
-        result = connection.execute("SELECT * FROM global_inventory")
