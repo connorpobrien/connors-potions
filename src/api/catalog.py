@@ -12,8 +12,7 @@ def get_catalog():
     # Get the number of red potions available
     with db.engine.begin() as connection:
            result = connection.execute("SELECT num_red_potions FROM global_inventory")   
-           inventory = result.fetchone()    
-           quantity_available = inventory[0]
+           quantity_available = result[0]
 
     # Can return a max of 20 items
     quantity_available = min(quantity_available, 20) 

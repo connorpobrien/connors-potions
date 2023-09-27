@@ -44,6 +44,8 @@ def get_bottle_plan():
            inventory = result.fetchone()    
            quantity_available = inventory[0]
 
+    
+
     return [
             {
                 "potion_type": [100, 0, 0, 0],
