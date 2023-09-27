@@ -38,10 +38,16 @@ def get_bottle_plan():
 
     # Initial logic: bottle all barrels into red potions.
 
+    # Get the number of red potions available
+    with db.engine.begin() as connection:
+           result = connection.execute("SELECT num_red_potions FROM global_inventory")   
+           inventory = result.fetchone()    
+           quantity_available = inventory[0]
+
     return [
             {
                 "potion_type": [100, 0, 0, 0],
-                "quantity": 5,
+                "quantity": quantity_available,
             }
         ]
 

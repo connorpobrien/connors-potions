@@ -35,10 +35,20 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     """ """
     print(wholesale_catalog)
 
-    return [
-        {
-            "sku": "SMALL_RED_BARREL",
-            "quantity": 1,
-        }
-    ]
+    # Get the number of red potions available
+    with db.engine.begin() as connection:
+           result = connection.execute("SELECT num_red_potions FROM global_inventory")   
+           inventory = result.fetchone()    
+           quantity_available = inventory[0]
+
+    # Purchase a new small red potion barrel only if the number of potions in inventory is less than 10
+    if quantity_available < 10:
+        return [
+            {
+                "sku": "SMALL_RED_BARREL",
+                "quantity": 1,
+            }
+        ]
+    else:
+         return []
 
