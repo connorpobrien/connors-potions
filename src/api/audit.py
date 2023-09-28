@@ -14,6 +14,8 @@ router = APIRouter(
 @router.get("/inventory")
 def get_inventory():
     """ """
+
+    # Call database to update return
     
     return {"number_of_potions": 0, "ml_in_barrels": 0, "gold": 0}
 

@@ -41,15 +41,13 @@ def get_bottle_plan():
     # Get the number of red potions available
     with db.engine.begin() as connection:
            result = connection.execute("SELECT num_red_potions FROM global_inventory")   
-           inventory = result.fetchone()    
-           quantity_available = inventory[0]
+           quantity_available = result[0]
 
-    
 
     return [
             {
                 "potion_type": [100, 0, 0, 0],
-                "quantity": quantity_available,
+                "quantity": quantity_available // 100,
             }
         ]
 
