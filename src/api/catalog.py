@@ -11,19 +11,23 @@ def get_catalog():
     """
     # Get the number of red potions available
     with db.engine.begin() as connection:
-           result = connection.execute("SELECT num_red_potions FROM global_inventory")   
-           quantity_available = result[0]
+        sql_query = """SELECT num_red_potions from global_inventory"""
+        result = connection.execute(sqlalchemy.text(sql_query))  
+        first_row = result.first()
+        num_red_potions = first_row.num_red_potions
 
-    # Can return a max of 20 items
-    quantity_available = min(quantity_available, 20) 
+    # Can return a max of 20 items, but for now we will only return 1
 
-    return [
-            {
-                "sku": "RED_POTION_0",
-                "name": "red potion",
-                "quantity": quantity_available,
-                "price": 50,
-                "potion_type": [100, 0, 0, 0],
-            }
-        ]
+    if num_red_potions > 0:
+        return [
+                {
+                    "sku": "RED_POTION_0",
+                    "name": "red potion",
+                    "quantity": num_red_potions,
+                    "price": 50,
+                    "potion_type": [100, 0, 0, 0],
+                }
+            ]
+    
+    return []
 

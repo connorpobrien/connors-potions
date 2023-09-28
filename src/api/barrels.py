@@ -25,8 +25,21 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
     """ """
     print(barrels_delivered)
 
-    # determine how many were delivers, reduce gold
-    # for now, if delivered, reduce gold by cost of one barrel
+    # determine how many were delivered, reduce gold
+    # For now, if delivered, reduce gold by cost of one barrel
+
+    # Get the number of red ml and amount of gold in inventory
+    with db.engine.begin() as connection:
+        sql_query = """SELECT gold, num_red_ml from global_inventory"""
+        result = connection.execute(sqlalchemy.text(sql_query))
+        first_row = result.first()
+        num_red_ml = first_row.num_red_ml
+        gold = first_row.gold
+
+    # for each barrel that was delivered, reduce gold and increase red_ml appropriately
+    for barrel in barrels_delivered:
+         # UPDATE
+         pass
 
     return "OK"
 

@@ -35,16 +35,29 @@ def get_bottle_plan():
 
     # Initial logic: bottle all barrels into red potions.
 
-    # Get the number of red potions available
+    # Get the number of red_ml available
     with db.engine.begin() as connection:
-           result = connection.execute("SELECT num_red_potions FROM global_inventory")   
-           quantity_available = result[0]
+        sql_query = """SELECT num_red_ml FROM global_inventory"""
+        result = connection.execute(sqlalchemy.text(sql_query))   
+        num_red_ml_available = result[0]
 
+    # Find how many red potions can be created
+    create_potions = num_red_ml_available // 100
 
+    # Update num_red_potions in inventory
+    with db.engine.begin() as connection:
+        sql_query = """UPDATE global_inventory SET num_red_potions = num_red_potions + :create_potions"""
+        connection.execute(sqlalchemy.text(sql_query), create_potions=create_potions)
+
+    # Update num_red_ml in inventory
+    with db.engine.begin() as connection:
+        sql_query = """UPDATE global_inventory SET num_red_ml = num_red_ml - :num_red_ml_available"""
+        connection.execute(sqlalchemy.text(sql_query), num_red_ml_available=num_red_ml_available)
+    
     return [
             {
                 "potion_type": [100, 0, 0, 0],
-                "quantity": quantity_available // 100,
+                "quantity": create_potions
             }
         ]
 
