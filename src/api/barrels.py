@@ -25,6 +25,9 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
     """ """
     print(barrels_delivered)
 
+    # determine how many were delivers, reduce gold
+    # for now, if delivered, reduce gold by cost of one barrel
+
     return "OK"
 
 # Gets called once a day
@@ -33,23 +36,20 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     """ """
     print(wholesale_catalog)
 
+    # Objective:
+    # Find number of potions available
+    # If less than 10, purchase 1 more barrel
+
     # Get the number of red potions available
     with db.engine.begin() as connection:
-           query_red_potions = connection.execute("SELECT num_red_potions FROM global_inventory")      
-           query_gold = connection.execute("SELECT gold FROM global_inventory")  
-           
-           red_potions_available = query_red_potions[0]
-           gold_available = query_gold[0]
+           # Get the number of red potions in inventory
+           sql_query = """SELECT gold from global_inventory"""
+           result = connection.execute(sqlalchemy.text(sql_query))  
+           first_row = result.first()
+           num_red_potions = first_row.gold
 
     # Purchase a new small red potion barrel only if the number of potions in inventory is less than 10
-    if red_potions_available < 10:
-
-        # Find cost of small red barrel
-
-        # UPDATE gold
-
-        # UPDATE ml of red potion
-
+    if num_red_potions < 10:
         return [
             {
                 "sku": "SMALL_RED_BARREL",
