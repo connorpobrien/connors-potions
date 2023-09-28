@@ -16,8 +16,12 @@ def get_inventory():
     """ """
 
     # Call database to update return
+    with db.engine.begin() as connection:
+        sql_query = """SELECT num_red_potions, num_red_ml, gold, from global_inventory"""
+        results = connection.execute(sqlalchemy.text(sql_query))
+        first_row = results.first()
     
-    return {"number_of_potions": 0, "ml_in_barrels": 0, "gold": 0}
+    return {"number_of_potions": first_row.num_red_potions, "ml_in_barrels": first_row.num_red_ml, "gold": first_row.gold}
 
 class Result(BaseModel):
     gold_match: bool
