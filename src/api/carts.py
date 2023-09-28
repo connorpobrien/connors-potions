@@ -4,9 +4,6 @@ from src.api import auth
 import sqlalchemy
 from src import database as db
 
-with db.engine.begin() as connection:
-        result = connection.execute("SELECT * FROM global_inventory")
-
 router = APIRouter(
     prefix="/carts",
     tags=["cart"],
