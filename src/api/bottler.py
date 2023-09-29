@@ -22,15 +22,18 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
 
     # Based on how many potions were delivered, update the inventory
 
-    # Update num_red_potions in inventory
-    # with db.engine.begin() as connection:
-    #     sql_query = """UPDATE global_inventory SET num_red_potions = num_red_potions + :create_potions"""
-    #     connection.execute(sqlalchemy.text(sql_query), create_potions=create_potions)
+    for potion in potions_delivered:
+        # Dealing with red potions only now
+        if potion.potion_type == [100, 0, 0, 0]:
+            # Reduce num_red_ml
+            with db.engine.begin() as connection:
+                sql_query = """UPDATE global_inventory SET num_red_ml = num_red_ml - :quantity"""
+                connection.execute(sqlalchemy.text(sql_query), quantity=potion.quantity*100)
 
-    # # Update num_red_ml in inventory
-    # with db.engine.begin() as connection:
-    #     sql_query = """UPDATE global_inventory SET num_red_ml = num_red_ml - :num_red_ml_available"""
-    #     connection.execute(sqlalchemy.text(sql_query), num_red_ml_available=num_red_ml_available)
+            # Increase num_red_potions
+            with db.engine.begin() as connection:
+                sql_query = """UPDATE global_inventory SET num_red_potions = num_red_potions + :quantity"""
+                connection.execute(sqlalchemy.text(sql_query), quantity=potion.quantity)
 
     return "OK"
 
