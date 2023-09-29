@@ -65,6 +65,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
         num_red_potions = first_row.num_red_potions
 
     # Purchase a new small red potion barrel only if the number of potions in inventory is less than 10
+    # Check gold and barrel quantitity
     if num_red_potions < 10:
         return [
             {
