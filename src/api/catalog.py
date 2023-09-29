@@ -16,14 +16,14 @@ def get_catalog():
         first_row = result.first()
         num_red_potions = first_row.num_red_potions
 
-    # Can return a max of 20 items, but for now we will only return 1
+    # Can return a max of 20 items,
 
     if num_red_potions > 0:
         return [
                 {
                     "sku": "RED_POTION_0",
                     "name": "red potion",
-                    "quantity": num_red_potions,
+                    "quantity": 1,  # Only buy one for now
                     "price": 50,
                     "potion_type": [100, 0, 0, 0],
                 }

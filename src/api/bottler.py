@@ -20,6 +20,18 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
     """ """
     print(potions_delivered)
 
+    # Based on how many potions were delivered, update the inventory
+
+    # Update num_red_potions in inventory
+    # with db.engine.begin() as connection:
+    #     sql_query = """UPDATE global_inventory SET num_red_potions = num_red_potions + :create_potions"""
+    #     connection.execute(sqlalchemy.text(sql_query), create_potions=create_potions)
+
+    # # Update num_red_ml in inventory
+    # with db.engine.begin() as connection:
+    #     sql_query = """UPDATE global_inventory SET num_red_ml = num_red_ml - :num_red_ml_available"""
+    #     connection.execute(sqlalchemy.text(sql_query), num_red_ml_available=num_red_ml_available)
+
     return "OK"
 
 # Gets called 4 times a day
@@ -39,20 +51,11 @@ def get_bottle_plan():
     with db.engine.begin() as connection:
         sql_query = """SELECT num_red_ml FROM global_inventory"""
         result = connection.execute(sqlalchemy.text(sql_query))   
-        num_red_ml_available = result[0]
+        first_row = result.first()  
+        num_red_ml_available = first_row.num_red_ml
 
     # Find how many red potions can be created
     create_potions = num_red_ml_available // 100
-
-    # Update num_red_potions in inventory
-    with db.engine.begin() as connection:
-        sql_query = """UPDATE global_inventory SET num_red_potions = num_red_potions + :create_potions"""
-        connection.execute(sqlalchemy.text(sql_query), create_potions=create_potions)
-
-    # Update num_red_ml in inventory
-    with db.engine.begin() as connection:
-        sql_query = """UPDATE global_inventory SET num_red_ml = num_red_ml - :num_red_ml_available"""
-        connection.execute(sqlalchemy.text(sql_query), num_red_ml_available=num_red_ml_available)
     
     return [
             {
