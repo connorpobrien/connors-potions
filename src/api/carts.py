@@ -13,18 +13,22 @@ router = APIRouter(
 class NewCart(BaseModel):
     customer: str
 
+carts = {}
+count = 0
+
 
 @router.post("/")
 def create_cart(new_cart: NewCart):
     """ """
-    return {"cart_id": 1}
+    count += 1
+    return {"cart_id": count}
 
 
 @router.get("/{cart_id}")
 def get_cart(cart_id: int):
     """ """
 
-    return {}
+    return carts[cart_id]
 
 
 class CartItem(BaseModel):
@@ -35,6 +39,8 @@ class CartItem(BaseModel):
 def set_item_quantity(cart_id: int, item_sku: str, cart_item: CartItem):
     """ """
 
+    carts[cart_id][item_sku] = cart_item.quantity
+
     return "OK"
 
 
@@ -44,6 +50,16 @@ class CartCheckout(BaseModel):
 @router.post("/{cart_id}/checkout")
 def checkout(cart_id: int, cart_checkout: CartCheckout):
     """ """
+
+    # Update gold
+    with db.engine.begin() as connection:
+        sql_query = """UPDATE global_inventory SET gold = gold + 50"""
+        connection.execute(sqlalchemy.text(sql_query))
+
+    # Update number of potions
+    with db.engine.begin() as connection:
+        sql_query = """UPDATE global_inventory SET num_red_potions = num_red_potions + 1"""
+        connection.execute(sqlalchemy.text(sql_query))
 
     return {"total_potions_bought": 1, "total_gold_paid": 50}
 
