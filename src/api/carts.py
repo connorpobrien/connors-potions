@@ -23,7 +23,7 @@ def create_cart(new_cart: NewCart):
     global count
     global carts
     count += 1
-    return {"cart_id": count}
+    return {count: new_cart.customer}
 
 
 @router.get("/{cart_id}")
@@ -59,6 +59,7 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
     global count
     global carts
 
+    # for now customers will only be able to buy 1 red potion
     # Update gold
     with db.engine.begin() as connection:
         sql_query = """UPDATE global_inventory SET gold = gold + 50"""
