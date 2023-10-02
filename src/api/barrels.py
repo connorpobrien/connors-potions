@@ -35,8 +35,6 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
         gold = first_row.gold
 
     # for each barrel that was delivered, reduce gold and increase red_ml appropriately
-    # For now just assume one barrel was delivered
-    # Update gold
     for barrel in barrels_delivered:
         new_gold = gold - barrel.price
         with db.engine.begin() as connection:
