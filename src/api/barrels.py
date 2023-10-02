@@ -23,7 +23,6 @@ class Barrel(BaseModel):
 @router.post("/deliver")
 def post_deliver_barrels(barrels_delivered: list[Barrel]):
     """ """
-    print(barrels_delivered)
 
     # Determine how many were delivered, reduce gold and increase num_ml appropriately
 
@@ -36,18 +35,19 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
         gold = first_row.gold
 
     # for each barrel that was delivered, reduce gold and increase red_ml appropriately
-    # for barrel in barrels_delivered:
+    # For now just assume one barrel was delivered
     # Update gold
-    new_gold = gold - 50
-    with db.engine.begin() as connection:
-        sql_query = """UPDATE global_inventory SET gold = :new_gold"""
-        connection.execute(sqlalchemy.text(sql_query), new_gold=new_gold)
+    if barrels_delivered:
+        new_gold = gold - 50
+        with db.engine.begin() as connection:
+            sql_query = """UPDATE global_inventory SET gold = :new_gold"""
+            connection.execute(sqlalchemy.text(sql_query), new_gold=new_gold)
 
-    # Update num_red_ml
-    new_red_ml = num_red_ml + 500
-    with db.engine.begin() as connection:
-        sql_query = """UPDATE global_inventory SET num_red_ml = :new_red_ml"""
-        connection.execute(sqlalchemy.text(sql_query), new_red_ml=new_red_ml)
+        # Update num_red_ml
+        new_red_ml = num_red_ml + 500
+        with db.engine.begin() as connection:
+            sql_query = """UPDATE global_inventory SET num_red_ml = :new_red_ml"""
+            connection.execute(sqlalchemy.text(sql_query), new_red_ml=new_red_ml)
 
     return "OK"
 
