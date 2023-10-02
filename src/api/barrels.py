@@ -37,17 +37,17 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
     # for each barrel that was delivered, reduce gold and increase red_ml appropriately
     # For now just assume one barrel was delivered
     # Update gold
-    # if barrels_delivered:
-    new_gold = gold - 50
-    with db.engine.begin() as connection:
-        sql_query = f"""UPDATE global_inventory SET gold = {new_gold}"""
-        connection.execute(sqlalchemy.text(sql_query))
+    for barrel in barrels_delivered:
+        new_gold = gold - barrel.price
+        with db.engine.begin() as connection:
+            sql_query = f"""UPDATE global_inventory SET gold = {new_gold}"""
+            connection.execute(sqlalchemy.text(sql_query))
 
-    # Update num_red_ml
-    new_red_ml = num_red_ml + 500
-    with db.engine.begin() as connection:
-        sql_query = f"""UPDATE global_inventory SET num_red_ml = {new_red_ml}"""
-        connection.execute(sqlalchemy.text(sql_query))
+        # Update num_red_ml
+        new_red_ml = num_red_ml + barrel.ml_per_barrel
+        with db.engine.begin() as connection:
+            sql_query = f"""UPDATE global_inventory SET num_red_ml = {new_red_ml}"""
+            connection.execute(sqlalchemy.text(sql_query))
 
     return "OK"
 

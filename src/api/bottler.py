@@ -27,13 +27,13 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
         if potion.potion_type == [100, 0, 0, 0]:
             # Reduce num_red_ml
             with db.engine.begin() as connection:
-                sql_query = """UPDATE global_inventory SET num_red_ml = num_red_ml - :quantity"""
-                connection.execute(sqlalchemy.text(sql_query), quantity=potion.quantity*100)
+                sql_query = f"""UPDATE global_inventory SET num_red_ml = num_red_ml - {potion.quantity*100}"""
+                connection.execute(sqlalchemy.text(sql_query))
 
             # Increase num_red_potions
             with db.engine.begin() as connection:
-                sql_query = """UPDATE global_inventory SET num_red_potions = num_red_potions + :quantity"""
-                connection.execute(sqlalchemy.text(sql_query), quantity=potion.quantity)
+                sql_query = f"""UPDATE global_inventory SET num_red_potions = num_red_potions + {potion.quantity}"""
+                connection.execute(sqlalchemy.text(sql_query))
 
     return "OK"
 
