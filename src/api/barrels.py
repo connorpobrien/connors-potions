@@ -41,13 +41,13 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
     new_gold = gold - 50
     with db.engine.begin() as connection:
         sql_query = f"""UPDATE global_inventory SET gold = {new_gold}"""
-        connection.execute(sqlalchemy.text(sql_query), new_gold=new_gold)
+        connection.execute(sqlalchemy.text(sql_query))
 
     # Update num_red_ml
     new_red_ml = num_red_ml + 500
     with db.engine.begin() as connection:
         sql_query = f"""UPDATE global_inventory SET num_red_ml = {new_red_ml}"""
-        connection.execute(sqlalchemy.text(sql_query), new_red_ml=new_red_ml)
+        connection.execute(sqlalchemy.text(sql_query))
 
     return "OK"
 
