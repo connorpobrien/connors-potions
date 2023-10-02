@@ -25,7 +25,7 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
     """ """
     print(barrels_delivered)
 
-    # Determine how many were delivered, reduce gold and increase num_ml appropriatel
+    # Determine how many were delivered, reduce gold and increase num_ml appropriately
 
     # Get the number of red ml and amount of gold in inventory
     with db.engine.begin() as connection:

@@ -20,6 +20,8 @@ count = 0
 @router.post("/")
 def create_cart(new_cart: NewCart):
     """ """
+    global count
+    global carts
     count += 1
     return {"cart_id": count}
 
