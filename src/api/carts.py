@@ -31,7 +31,6 @@ def get_cart(cart_id: int):
     """ """
     global count
     global carts
-    print(carts)
 
     return carts[cart_id]
 
@@ -46,7 +45,12 @@ def set_item_quantity(cart_id: int, item_sku: str, cart_item: CartItem):
     global count
     global carts
 
-    carts[cart_id][item_sku] = cart_item.quantity
+    if cart_id not in carts:
+        return "Cart does not exist"
+    
+    # else update quantity
+    # else: 
+    #     carts[cart_id] = cart_item.quantity
 
     return "OK"
 
