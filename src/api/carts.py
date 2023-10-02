@@ -31,6 +31,7 @@ def get_cart(cart_id: int):
     """ """
     global count
     global carts
+    print(carts)
 
     return carts[cart_id]
 
