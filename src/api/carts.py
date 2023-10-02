@@ -16,13 +16,13 @@ class NewCart(BaseModel):
 carts = {}
 count = 0
 
-
 @router.post("/")
 def create_cart(new_cart: NewCart):
     """ """
     global count
     global carts
     count += 1
+    carts[count] = new_cart.customer
     return {count: new_cart.customer}
 
 
