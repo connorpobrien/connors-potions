@@ -53,24 +53,34 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
 @router.post("/plan")
 def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     """ """
-    print(wholesale_catalog)
+    # print(wholesale_catalog)
 
     with db.engine.begin() as connection:
-        # Get the number of red potions in inventory
-        sql_query = """SELECT num_red_potions from global_inventory"""
+        # Get the number of potions in inventory for each color
+        sql_query = """SELECT num_red_potions, num_green_potions, num_blue_potions from global_inventory"""
         result = connection.execute(sqlalchemy.text(sql_query))  
         first_row = result.first()
         num_red_potions = first_row.num_red_potions
+        num_green_potions = first_row.num_green_potions
+        num_blue_potions = first_row.num_blue_potions
 
-    # Purchase a new small red potion barrel only if the number of potions in inventory is less than 10
-    # Check gold and barrel quantitity
+    # Purchase a new small potion barrel only if the number of potions in inventory is less than 10
+    res = []
     if num_red_potions < 10:
-        return [
-            {
-                "sku": "SMALL_RED_BARREL",
-                "quantity": 1,
-            }
-        ]
-    else:
-         return []
+        res.append({
+            "sku": "SMALL_RED_BARREL",
+            "quantity": 1,
+        })
+    if num_green_potions < 10:
+        res.append({
+            "sku": "SMALL_GREEN_BARREL",
+            "quantity": 1,
+        })
+    if num_blue_potions < 10:
+        res.append({
+            "sku": "SMALL_BLUE_BARREL",
+            "quantity": 1,
+        })
+
+    return res
 
