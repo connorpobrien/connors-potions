@@ -19,20 +19,25 @@ count = 0
 @router.post("/")
 def create_cart(new_cart: NewCart):
     """ """
+    # generate id
     global count
     global carts
     count += 1
+
+    # add id -> customer to carts
     carts[count] = new_cart.customer
-    return {count: new_cart.customer}
+    return count
 
 
 @router.get("/{cart_id}")
 def get_cart(cart_id: int):
     """ """
+    # retrieve customer's cart based on the cart_id
     global count
     global carts
 
-    return carts[cart_id]
+    # return carts[cart_id]
+    return {}
 
 
 class CartItem(BaseModel):
