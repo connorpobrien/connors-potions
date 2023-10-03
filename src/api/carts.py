@@ -36,10 +36,8 @@ def get_cart(cart_id: int):
     global count
     global carts
 
-    # return carts[cart_id]
-    return {}
-
-
+    return carts[cart_id]
+    
 class CartItem(BaseModel):
     quantity: int
 
@@ -69,7 +67,7 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
     global count
     global carts
 
-    # for now customers will only be able to buy 1 red potion
+    # For now customers will only be able to buy 1 potion for each color
     # Update gold
     with db.engine.begin() as connection:
         sql_query = """UPDATE global_inventory SET gold = gold + 50"""
