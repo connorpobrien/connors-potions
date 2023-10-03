@@ -83,27 +83,36 @@ def get_bottle_plan():
         num_green_ml_available = first_row.num_green_ml
         num_blue_ml_available = first_row.num_blue_ml
 
-    # Find how many red potions can be created
-    create_red_potions = num_red_ml_available // 100
-
+    # Bottle as many as possible for each color
     res = []
-
-    if num_red_ml_available > 0:
+    if num_red_ml_available > 99:
         res.append({
             "potion_type": [100, 0, 0, 0],
-            "quantity": create_red_potions
+            "quantity": num_red_ml_available // 100
         })
+        # Update table to deduct the number of red ml
+        with db.engine.begin() as connection:
+            sql_query = f"""UPDATE global_inventory SET num_red_ml = num_red_ml - {num_red_ml_available // 100 * 100}"""
+            connection.execute(sqlalchemy.text(sql_query))
 
-    if num_green_ml_available > 0:
+    if num_green_ml_available > 99:
         res.append({
             "potion_type": [0, 100, 0, 0],
-            "quantity": 1
+            "quantity": num_green_ml_available // 100
         })
+        # Update table to deduct the number of green ml
+        with db.engine.begin() as connection:
+            sql_query = f"""UPDATE global_inventory SET num_green_ml = num_green_ml - {num_green_ml_available // 100 * 100}"""
+            connection.execute(sqlalchemy.text(sql_query))
 
-    if num_blue_ml_available > 0:
+    if num_blue_ml_available > 99:
         res.append({
             "potion_type": [0, 0, 100, 0],
-            "quantity": 1
+            "quantity": num_blue_ml_available // 100
         })
+        # Update table to deduct the number of blue ml
+        with db.engine.begin() as connection:
+            sql_query = f"""UPDATE global_inventory SET num_blue_ml = num_blue_ml - {num_blue_ml_available // 100 * 100}"""
+            connection.execute(sqlalchemy.text(sql_query))
     
     return res

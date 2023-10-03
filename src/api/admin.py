@@ -31,6 +31,29 @@ def reset():
         sql_query = """UPDATE global_inventory SET num_red_potions = 0"""
         connection.execute(sqlalchemy.text(sql_query))
 
+    # set num_green_ml to 0
+    with db.engine.begin() as connection:
+        sql_query = """UPDATE global_inventory SET num_green_ml = 0"""
+        connection.execute(sqlalchemy.text(sql_query))
+
+    # set num_green_potions to 0
+    with db.engine.begin() as connection:
+        sql_query = """UPDATE global_inventory SET num_green_potions = 0"""
+        connection.execute(sqlalchemy.text(sql_query))
+
+    # set num_blue_ml to 0
+    with db.engine.begin() as connection:
+        sql_query = """UPDATE global_inventory SET num_blue_ml = 0"""
+        connection.execute(sqlalchemy.text(sql_query))
+
+    # set num_blue_potions to 0
+    with db.engine.begin() as connection:
+        sql_query = """UPDATE global_inventory SET num_blue_potions = 0"""
+        connection.execute(sqlalchemy.text(sql_query))
+
+    # Reset carts
+    # ???
+
     return "OK"
 
 
