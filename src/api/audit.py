@@ -19,7 +19,7 @@ def get_inventory():
         sql_query = """SELECT 
                             SUM(num_red_potions + num_green_potions + num_blue_potions) AS total_potions,
                             SUM(num_red_ml + num_green_ml + num_blue_ml) AS total_ml,
-                            gold AS gold
+                            SUM(gold) AS gold
                         FROM 
                             global_inventory;
                         """
