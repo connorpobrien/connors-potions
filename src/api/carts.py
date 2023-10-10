@@ -25,18 +25,19 @@ def create_cart(new_cart: NewCart):
     count += 1
 
     # add id -> customer to carts
-    carts[count] = new_cart.customer
-    return count
+    carts[count] = {}
+    return {"cart_id": count}
 
 
 @router.get("/{cart_id}")
 def get_cart(cart_id: int):
     """ """
     # retrieve customer's cart based on the cart_id
-    global count
-    global carts
+    # global count
+    # global carts
 
-    return carts[cart_id]
+    # return carts[cart_id]
+    return {}
     
 class CartItem(BaseModel):
     quantity: int
@@ -48,8 +49,8 @@ def set_item_quantity(cart_id: int, item_sku: str, cart_item: CartItem):
     global count
     global carts
 
-    if cart_id not in carts:
-        return "Cart does not exist"
+    # if cart_id not in carts:
+    #     return "Cart does not exist"
     
     # else update quantity
     # else: 
@@ -66,6 +67,9 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
     """ """
     global count
     global carts
+
+    cart = carts[cart_id]
+
 
     # For now customers will only be able to buy 1 potion for each color
     # Update gold

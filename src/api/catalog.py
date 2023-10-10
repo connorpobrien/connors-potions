@@ -23,30 +23,34 @@ def get_catalog():
 
     res = []
     
-    if num_red_potions > 0:
+    # hard coding to ensure we sell a red, green potion. Will fix. Also setting price to 1 temporarily
+    # if num_red_potions > 0:
+    if True:
         res.append({
             "sku": "RED_POTION_0",
             "name": "red potion",
             "quantity": 1,
-            "price": 50,
+            "price": 1,
             "potion_type": [100, 0, 0, 0],
         })
 
-    if num_green_potions > 0:
+    # if num_green_potions > 0:
+    if True:
         res.append({
             "sku": "GREEN_POTION_0",
             "name": "green potion",
             "quantity": 1,
-            "price": 50,
+            "price": 1,
             "potion_type": [0, 100, 0, 0],
         })
 
-    if num_blue_potions > 0:
+    # if num_blue_potions > 0:
+    if True: 
         res.append({
             "sku": "BLUE_POTION_0",
             "name": "blue potion",
             "quantity": 1,
-            "price": 50,
+            "price": 1,
             "potion_type": [0, 0, 100, 0],
         })
     

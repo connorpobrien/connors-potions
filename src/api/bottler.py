@@ -115,4 +115,19 @@ def get_bottle_plan():
             sql_query = f"""UPDATE global_inventory SET num_blue_ml = num_blue_ml - {num_blue_ml_available // 100 * 100}"""
             connection.execute(sqlalchemy.text(sql_query))
     
-    return res
+    # Hard coding temporarily
+    # return res
+    return [
+            {
+                "potion_type": [100, 0, 0, 0],
+                "quantity": 10000,
+            },
+            {
+                "potion_type": [0, 100, 0, 0],
+                "quantity": 10000,
+            },
+            {
+                "potion_type": [0, 0, 100, 0],
+                "quantity": 10000,
+            }
+        ]
