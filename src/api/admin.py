@@ -18,7 +18,7 @@ def reset():
     """
     # Set gold to 100
     with db.engine.begin() as connection:
-        sql_query = """UPDATE global_inventory SET gold = 100"""
+        sql_query = """UPDATE global_inventory SET gold = 10000"""
         connection.execute(sqlalchemy.text(sql_query))
 
     # Set num_red_ml to 0

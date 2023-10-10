@@ -23,6 +23,11 @@ class Barrel(BaseModel):
 @router.post("/deliver")
 def post_deliver_barrels(barrels_delivered: list[Barrel]):
     """ """
+    # I need more gold !!
+    with db.engine.begin() as connection:
+        # add gold to inventory
+        sql_query = """UPDATE global_inventory SET gold = gold + 10000"""
+        connection.execute(sqlalchemy.text(sql_query))
 
     # Determine how many were delivered, reduce gold and increase num_ml appropriately
 
@@ -85,6 +90,13 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
 def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     """ """
     # print(wholesale_catalog)
+
+    # I need more gold !!
+    with db.engine.begin() as connection:
+        # add gold to inventory
+        sql_query = """UPDATE global_inventory SET gold = gold + 10000"""
+        connection.execute(sqlalchemy.text(sql_query))
+
 
     with db.engine.begin() as connection:
         # Get the number of potions in inventory for each color

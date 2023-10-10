@@ -74,7 +74,6 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
 
     cart = carts[cart_id]
 
-
     # count number of potions bought
     num_potions = sum(cart["items"].values())
 
