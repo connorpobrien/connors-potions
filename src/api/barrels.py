@@ -23,12 +23,9 @@ class Barrel(BaseModel):
 @router.post("/deliver")
 def post_deliver_barrels(barrels_delivered: list[Barrel]):
     """ """
-
-    # good to have copius logs
     print(barrels_delivered)
 
     gold_paid, red_ml, green_ml, blue_ml, dark_ml = 0, 0, 0, 0, 0
-
     for barrel_delivered in barrels_delivered:
         gold_paid += barrel_delivered.price * barrel_delivered.quantity
         if barrel_delivered.potion_type == [1, 0, 0, 0]:
@@ -45,7 +42,7 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
     print(f"gold_paid: {gold_paid} red_ml: {red_ml} green_ml: {green_ml} blue_ml: {blue_ml} dark_ml: {dark_ml}")
 
     with db.engine.begin() as connection:
-        query = sqlalchemy.text("""UPDATE global_inventory SET 
+        sql_query = sqlalchemy.text("""UPDATE global_inventory SET 
                                gold = gold + :gold_paid,
                                num_red_ml = num_red_ml + :red_ml,
                                num_green_ml = num_green_ml + :green_ml,
@@ -53,7 +50,6 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
                                num_dark_ml = num_dark_ml + :dark_ml""")
         connection.execute(query, {"gold_paid": gold_paid, "red_ml": red_ml, "green_ml": green_ml, "blue_ml": blue_ml, "dark_ml": dark_ml})
     
-
     return "OK"
 
     
@@ -76,7 +72,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
                 "sku": barrel.sku,
                 "quantity": 1, # only buying one for now
             })
-            # update gold
+            # spent gold
             gold -= barrel.price
             
     # Update global_inventory with new gold value
