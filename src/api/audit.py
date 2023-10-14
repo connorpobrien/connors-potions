@@ -14,7 +14,7 @@ router = APIRouter(
 @router.get("/inventory")
 def get_inventory():
     """ """
-    # Call database to update return
+    # Get values from database
     with db.engine.begin() as connection:
         sql_query = """SELECT 
                             SUM(num_red_potions + num_green_potions + num_blue_potions) AS total_potions,
@@ -25,6 +25,8 @@ def get_inventory():
                         """
         results = connection.execute(sqlalchemy.text(sql_query))
         first_row = results.first()
+
+    
     
     return {"number_of_potions": first_row.total_potions, "ml_in_barrels": first_row.total_ml, "gold": first_row.gold}
 

@@ -27,7 +27,7 @@ def create_cart(new_cart: NewCart):
     # add id -> customer to carts
     count += 1
     carts[count] = {"customer": new_cart.customer, "items": {}}
-    return {"cart_id": str(count)}
+    return {"cart_id": count}
 
 
 @router.get("/{cart_id}")

@@ -16,43 +16,24 @@ def reset():
     Reset the game state. Gold goes to 100, all potions are removed from
     inventory, and all barrels are removed from inventory. Carts are all reset.
     """
-    # Set gold to 100
     with db.engine.begin() as connection:
-        sql_query = """UPDATE global_inventory SET gold = 10000"""
+        # Reset gold to 100. Set all ml to 0
+        sql_query = """UPDATE global_inventory SET gold = 10000,
+                                                num_red_ml = 0,
+                                                num_blue_ml = 0,
+                                                num_green_ml = 0,
+                                                num_dark_ml = 0"""
         connection.execute(sqlalchemy.text(sql_query))
 
-    # Set num_red_ml to 0
-    with db.engine.begin() as connection:
-        sql_query = """UPDATE global_inventory SET num_red_ml = 0"""
+        # Set number of potions to 0
+
+
+        # Delete all carts and cart items
+        sql_query = """DELETE FROM carts"""
         connection.execute(sqlalchemy.text(sql_query))
 
-    # Set num_red_potions to 0
-    with db.engine.begin() as connection:
-        sql_query = """UPDATE global_inventory SET num_red_potions = 0"""
+        sql_query = """DELETE FROM cart_items"""
         connection.execute(sqlalchemy.text(sql_query))
-
-    # set num_green_ml to 0
-    with db.engine.begin() as connection:
-        sql_query = """UPDATE global_inventory SET num_green_ml = 0"""
-        connection.execute(sqlalchemy.text(sql_query))
-
-    # set num_green_potions to 0
-    with db.engine.begin() as connection:
-        sql_query = """UPDATE global_inventory SET num_green_potions = 0"""
-        connection.execute(sqlalchemy.text(sql_query))
-
-    # set num_blue_ml to 0
-    with db.engine.begin() as connection:
-        sql_query = """UPDATE global_inventory SET num_blue_ml = 0"""
-        connection.execute(sqlalchemy.text(sql_query))
-
-    # set num_blue_potions to 0
-    with db.engine.begin() as connection:
-        sql_query = """UPDATE global_inventory SET num_blue_potions = 0"""
-        connection.execute(sqlalchemy.text(sql_query))
-
-    # Reset carts
-    # ???
 
     return "OK"
 
@@ -60,7 +41,6 @@ def reset():
 @router.get("/shop_info/")
 def get_shop_info():
     """ """
-    # TODO: Change me!
     return {
         "shop_name": "connors-potions",
         "shop_owner": "Connor OBrien",

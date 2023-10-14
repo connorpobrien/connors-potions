@@ -23,6 +23,10 @@ class Barrel(BaseModel):
 @router.post("/deliver")
 def post_deliver_barrels(barrels_delivered: list[Barrel]):
     """ """
+
+    # good to have copius logs
+
+
     # I need more gold !!
     with db.engine.begin() as connection:
         # add gold to inventory
