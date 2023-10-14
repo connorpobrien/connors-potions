@@ -16,19 +16,25 @@ def get_inventory():
     """ """
     # Get values from database
     with db.engine.begin() as connection:
+        # get data from global_inventory
         sql_query = """SELECT 
-                            SUM(num_red_potions + num_green_potions + num_blue_potions) AS total_potions,
-                            SUM(num_red_ml + num_green_ml + num_blue_ml) AS total_ml,
-                            SUM(gold) AS gold
+                            gold,
+                            num_red_ml,
+                            num_green_ml,
+                            num_blue_ml,
+                            num_dark_ml
                         FROM 
                             global_inventory;
                         """
-        results = connection.execute(sqlalchemy.text(sql_query))
-        first_row = results.first()
+        global_inventory = connection.execute(sqlalchemy.text(sql_query)).first()
+        gold, num_red_ml, num_green_ml, num_blue_ml, num_dark_ml = global_inventory
+        
+        # Get data from catalog
 
     
-    
-    return {"number_of_potions": first_row.total_potions, "ml_in_barrels": first_row.total_ml, "gold": first_row.gold}
+    return {"number_of_potions": catalog.total_potions, 
+            "ml_in_barrels": sum(num_red_ml, num_blue_ml, num_green_ml, num_dark_ml), 
+            "gold": gold}
 
 class Result(BaseModel):
     gold_match: bool
