@@ -31,8 +31,10 @@ def get_inventory():
         
         # Get data from catalog
 
+        total_potions = 0
+
     
-    return {"number_of_potions": catalog.total_potions, 
+    return {"number_of_potions": total_potions, 
             "ml_in_barrels": sum(num_red_ml, num_blue_ml, num_green_ml, num_dark_ml), 
             "gold": gold}
 

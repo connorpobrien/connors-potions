@@ -25,70 +25,38 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
     """ """
 
     # good to have copius logs
+    print(barrels_delivered)
 
+    gold_paid, red_ml, green_ml, blue_ml, dark_ml = 0, 0, 0, 0, 0
 
-    # I need more gold !!
-    with db.engine.begin() as connection:
-        # add gold to inventory
-        sql_query = """UPDATE global_inventory SET gold = gold + 10000"""
-        connection.execute(sqlalchemy.text(sql_query))
-
-    # Determine how many were delivered, reduce gold and increase num_ml appropriately
-
-    # Get the number of ml for each color and amount of gold in inventory
-    with db.engine.begin() as connection:
-        sql_query = """SELECT gold, num_red_ml, num_green_ml, num_blue_ml from global_inventory"""
-        result = connection.execute(sqlalchemy.text(sql_query))
-        first_row = result.first()
-        num_red_ml = first_row.num_red_ml
-        num_green_ml = first_row.num_green_ml
-        num_blue_ml = first_row.num_blue_ml
-        gold = first_row.gold
-
-    # for each barrel that was delivered, reduce gold and increase red_ml appropriately
-    for barrel in barrels_delivered:
-        # Red
-        if barrel.potion_type == [100, 0, 0, 0]:
-            # Reduce gold
-            new_gold = gold - barrel.price
-            with db.engine.begin() as connection:
-                sql_query = f"""UPDATE global_inventory SET gold = {new_gold}"""
-                connection.execute(sqlalchemy.text(sql_query))
-
-            # Update num_red_ml
-            new_red_ml = num_red_ml + barrel.ml_per_barrel
-            with db.engine.begin() as connection:
-                sql_query = f"""UPDATE global_inventory SET num_red_ml = {new_red_ml}"""
-                connection.execute(sqlalchemy.text(sql_query))
-        # Green
-        elif barrel.potion_type == [0, 100, 0, 0]:
-            # Reduce gold
-            new_gold = gold - barrel.price
-            with db.engine.begin() as connection:
-                sql_query = f"""UPDATE global_inventory SET gold = {new_gold}"""
-                connection.execute(sqlalchemy.text(sql_query))
-
-            # Update num_green_ml
-            new_green_ml = num_green_ml + barrel.ml_per_barrel
-            with db.engine.begin() as connection:
-                sql_query = f"""UPDATE global_inventory SET num_green_ml = {new_green_ml}"""
-                connection.execute(sqlalchemy.text(sql_query))
-        # Blue
-        elif barrel.potion_type == [0, 0, 100, 0]:
-            # Reduce gold
-            new_gold = gold - barrel.price
-            with db.engine.begin() as connection:
-                sql_query = f"""UPDATE global_inventory SET gold = {new_gold}"""
-                connection.execute(sqlalchemy.text(sql_query))
-
-            # Update num_blue_ml
-            new_blue_ml = num_blue_ml + barrel.ml_per_barrel
-            with db.engine.begin() as connection:
-                sql_query = f"""UPDATE global_inventory SET num_blue_ml = {new_blue_ml}"""
-                connection.execute(sqlalchemy.text(sql_query))
+    for barrel_delivered in barrels_delivered:
+        gold_paid += barrel_delivered.price * barrel_delivered.quantity
+        if barrel_delivered.potion_type == [1, 0, 0, 0]:
+            red_ml += barrel_delivered.ml_per_barrel * barrel_delivered.quantity
+        elif barrel_delivered.potion_type == [0, 1, 0, 0]:
+            green_ml += barrel_delivered.ml_per_barrel * barrel_delivered.quantity
+        elif barrel_delivered.potion_type == [0, 0, 1, 0]:
+            blue_ml += barrel_delivered.ml_per_barrel * barrel_delivered.quantity
+        elif barrel_delivered.potion_type == [0, 0, 0, 1]:
+            dark_ml += barrel_delivered.ml_per_barrel * barrel_delivered.quantity
+        else:
+            raise Exception("Invalid potion type")
         
+    print(f"gold_paid: {gold_paid} red_ml: {red_ml} green_ml: {green_ml} blue_ml: {blue_ml} dark_ml: {dark_ml}")
+
+    with db.engine.begin() as connection:
+        query = sqlalchemy.text("""UPDATE global_inventory SET 
+                               gold = gold + :gold_paid,
+                               num_red_ml = num_red_ml + :red_ml,
+                               num_green_ml = num_green_ml + :green_ml,
+                               num_blue_ml = num_blue_ml + :blue_ml,
+                               num_dark_ml = num_dark_ml + :dark_ml""")
+        connection.execute(query, {"gold_paid": gold_paid, "red_ml": red_ml, "green_ml": green_ml, "blue_ml": blue_ml, "dark_ml": dark_ml})
+    
+
     return "OK"
 
+    
 # Gets called once a day
 @router.post("/plan")
 def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
