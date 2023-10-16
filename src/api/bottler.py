@@ -4,6 +4,8 @@ from pydantic import BaseModel
 from src.api import auth
 import sqlalchemy
 from src import database as db
+import random
+import string
 
 router = APIRouter(
     prefix="/bottler",
@@ -27,6 +29,18 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
 
         # update catalog
         with db.engine.begin() as connection:
+            # generate sku
+            generate_sku = (lambda: ''.join(random.choice(string.ascii_letters + string.digits + "_") 
+                for _ in range(random.randint(1, 20))))
+            # generate a sku that doesnt already exists in the database
+            while True:
+                sku = generate_sku()
+                sql_query = """SELECT sku FROM catalog WHERE sku = :sku"""
+                result = connection.execute(sqlalchemy.text(sql_query), {"sku": sku})
+                if not result.first():
+                    break
+            
+            # insert into catalog
             pass
     
 
