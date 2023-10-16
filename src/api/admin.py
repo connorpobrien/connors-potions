@@ -21,7 +21,7 @@ def reset():
     """
     with db.engine.begin() as connection:
         # Reset gold to 100. Set all ml to 0
-        reset_global_inventory = """UPDATE global_inventory SET gold = 100,
+        reset_global_inventory = """UPDATE global_inventory SET gold = 10000,
                                                 num_red_ml = 0,
                                                 num_blue_ml = 0,
                                                 num_green_ml = 0,
