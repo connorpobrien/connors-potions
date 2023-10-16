@@ -32,7 +32,7 @@ def reset():
         connection.execute(sqlalchemy.text(reset_catalog))
 
         # repopulate catalog
-        generate_sku = (lambda: ''.join(random.choice(string.ascii_letters + string.digits + "_") for _ in range(random.randint(1, 20))))
+        generate_sku = (lambda: ''.join(random.choice(string.ascii_letters + string.digits + "_") for _ in range(random.randint(1, 20)))) # Matching regex ^[a-zA-Z0-9_]{1,20}$
         random_skus = set()
         for _ in range(100):
             random_skus.add(generate_sku())
@@ -47,7 +47,7 @@ def reset():
                             [0, 50, 50, 0],
                             [0, 50, 0, 50],
                             [0, 0, 50, 50]] # I think more potion types will be added in future?
-        build_catalog = """INSERT INTO catalog (sku, quantity, price, red_ml, green_ml, blue_ml, dark_ml)
+        build_catalog = """INSERT INTO catalog (sku, quantity, price, num_red_ml, num_green_ml, num_blue_ml, num_dark_ml)
                             VALUES (:sku, :quantity, :price, :red_ml, :green_ml, :blue_ml, :dark_ml)"""
         for i in range(10):
             sku = unique_skus.pop()
