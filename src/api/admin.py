@@ -27,6 +27,7 @@ def reset():
                                                 num_green_ml = 0,
                                                 num_dark_ml = 0"""
         connection.execute(sqlalchemy.text(reset_global_inventory))
+        print("Reset global inventory - Success")
 
         # Clear and reset catalog
         reset_catalog = """DELETE FROM catalog"""
@@ -51,12 +52,18 @@ def reset():
             price = 1
             connection.execute(sqlalchemy.text(build_catalog), {"sku": sku, "name": name, "quantity": quantity, "price": price, "red_ml": red_ml, "green_ml": green_ml, "blue_ml": blue_ml, "dark_ml": dark_ml})
 
+        print("Reset catalog - Success")
+
         # Delete all carts and cart items
         reset_carts_items = """DELETE FROM cart_items"""
         connection.execute(sqlalchemy.text(reset_carts_items))
 
+        print("Reset cart items - Success")
+
         reset_carts = """DELETE FROM carts"""
         connection.execute(sqlalchemy.text(reset_carts))
+
+        print("Reset carts - Success")
 
     return "OK"
 
@@ -65,6 +72,7 @@ def reset():
 def get_shop_info():
     # -- ✅✅✅ -- #
     """ """
+    print("Get shop info - Success"")
     return {
         "shop_name": "connors-potions",
         "shop_owner": "Connor OBrien",

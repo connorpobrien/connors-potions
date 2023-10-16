@@ -26,6 +26,9 @@ def get_inventory():
         # Get data from catalog
         sql_query = """SELECT SUM(quantity) AS total_potions FROM catalog"""
         total_potions = connection.execute(sqlalchemy.text(sql_query)).first().total_potions
+
+    print("Get inventory - Success")
+    print(f"gold: {gold} total_potions: {total_potions} total_ml: {total_ml}")
     
     return {"number_of_potions": total_potions, "ml_in_barrels": total_ml, "gold": gold}
 
