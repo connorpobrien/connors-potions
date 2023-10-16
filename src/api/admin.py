@@ -72,7 +72,7 @@ def reset():
 def get_shop_info():
     # -- ✅✅✅ -- #
     """ """
-    print("Get shop info - Success"")
+    print("Get shop info - Success")
     return {
         "shop_name": "connors-potions",
         "shop_owner": "Connor OBrien",
