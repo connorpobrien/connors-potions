@@ -52,11 +52,11 @@ def reset():
             connection.execute(sqlalchemy.text(build_catalog), {"sku": sku, "name": name, "quantity": quantity, "price": price, "red_ml": red_ml, "green_ml": green_ml, "blue_ml": blue_ml, "dark_ml": dark_ml})
 
         # Delete all carts and cart items
-        reset_carts = """DELETE FROM carts"""
-        connection.execute(sqlalchemy.text(reset_carts))
-
         reset_carts_items = """DELETE FROM cart_items"""
         connection.execute(sqlalchemy.text(reset_carts_items))
+
+        reset_carts = """DELETE FROM carts"""
+        connection.execute(sqlalchemy.text(reset_carts))
 
     return "OK"
 
