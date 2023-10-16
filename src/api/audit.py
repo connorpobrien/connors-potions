@@ -17,29 +17,19 @@ def get_inventory():
     # Get values from database
     with db.engine.begin() as connection:
         # get data from global_inventory
-        sql_query = """SELECT 
-                            gold,
-                            num_red_ml,
-                            num_green_ml,
-                            num_blue_ml,
-                            num_dark_ml
-                        FROM 
-                            global_inventory;
-                        """
+        sql_query = """SELECT gold, 
+                       SUM(num_red_ml, num_green_ml, num_blue_ml, num_dark_ml) AS ml_in_barrels
+                       FROM global_inventory"""
         global_inventory = connection.execute(sqlalchemy.text(sql_query)).first()
         gold = global_inventory.gold
-        num_red_ml = global_inventory.num_red_ml
-        num_green_ml = global_inventory.num_green_ml
-        num_blue_ml = global_inventory.num_blue_ml
-        num_dark_ml = global_inventory.num_dark_ml
+        ml_in_barrels = global_inventory.ml_in_barrels
         
         # Get data from catalog
-
-        total_potions = 0
-
+        sql_query = """SELECT SUM(quantity) FROM catalog"""
+        total_potions = connection.execute(sqlalchemy.text(sql_query)).first()
     
     return {"number_of_potions": total_potions, 
-            "ml_in_barrels": sum(num_red_ml, num_blue_ml, num_green_ml, num_dark_ml), 
+            "ml_in_barrels": ml_in_barrels,
             "gold": gold}
 
 class Result(BaseModel):
