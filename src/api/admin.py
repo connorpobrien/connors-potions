@@ -34,7 +34,7 @@ def reset():
         # repopulate catalog
         generate_sku = (lambda: ''.join(random.choice(string.ascii_letters + string.digits + "_") for _ in range(random.randint(1, 20))))
         random_skus = set()
-        for _ in range(20):
+        for _ in range(100):
             random_skus.add(generate_sku())
         unique_skus = list(random_skus) 
         possible_potions = [[100, 0, 0, 0],
