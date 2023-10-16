@@ -1,3 +1,5 @@
+/* TODO: UPDATE */
+
 /* global_inventory */
 create table
   public.global_inventory (
