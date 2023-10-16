@@ -65,6 +65,16 @@ def get_bottle_plan():
     # green potion to add.
     # Expressed in integers from 1 to 100 that must sum up to 100.
 
+    # query global
+
+    # query catalog - determine which potions in catalog need more bottles
+
+    # update catalog
+
+    # update global
+
+    # return bottle plan
+
     
     # [100, 0, 0, 0]
     # [0, 100, 0, 0]
@@ -76,4 +86,4 @@ def get_bottle_plan():
     # [0, 50, 50, 0]
     # [0, 50, 0, 50]
     # [0, 0, 50, 50]
-    
+

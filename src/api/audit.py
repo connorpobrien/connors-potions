@@ -18,19 +18,15 @@ def get_inventory():
     with db.engine.begin() as connection:
         # get data from global_inventory
         sql_query = """SELECT gold, num_red_ml, num_green_ml, num_blue_ml, num_dark_ml FROM global_inventory"""
-        global_inventory = connection.execute(sqlalchemy.text(sql_query)).first()
-        total_gold = global_inventory.gold
-        red_ml = global_inventory.num_red_ml
-        green_ml = global_inventory.num_green_ml
-        blue_ml = global_inventory.num_blue_ml
-        dark_ml = global_inventory.num_dark_ml
-        total_ml = sum([red_ml, green_ml, blue_ml, dark_ml])
-        
+        global_inventory = connection.execute(sqlalchemy.text(sql_query))
+        gold, num_red_ml, num_green_ml, num_blue_ml, num_dark_ml = global_inventory.first()
+        total_ml = num_red_ml + num_green_ml + num_blue_ml + num_dark_ml
+
         # Get data from catalog
-        sql_query = """SELECT SUM(quantity) FROM catalog"""
-        total_potions = connection.execute(sqlalchemy.text(sql_query)).first()
+        sql_query = """SELECT SUM(quantity) AS total_potions FROM catalog"""
+        total_potions = connection.execute(sqlalchemy.text(sql_query)).first().total_potions
     
-    return {"number_of_potions": total_potions, "ml_in_barrels": total_ml, "gold": total_gold}
+    return {"number_of_potions": total_potions, "ml_in_barrels": total_ml, "gold": gold}
 
 class Result(BaseModel):
     gold_match: bool
