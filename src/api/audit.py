@@ -13,6 +13,7 @@ router = APIRouter(
 
 @router.get("/inventory")
 def get_inventory():
+    # -- ✅✅✅ -- #
     """ """
     # Get values from database
     with db.engine.begin() as connection:
@@ -36,6 +37,7 @@ class Result(BaseModel):
 # Gets called once a day
 @router.post("/results")
 def post_audit_results(audit_explanation: Result):
+    # -- ✅✅✅ -- #
     """ """
     print(audit_explanation)
 

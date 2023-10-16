@@ -22,6 +22,7 @@ class Barrel(BaseModel):
 
 @router.post("/deliver")
 def post_deliver_barrels(barrels_delivered: list[Barrel]):
+    # -- ✅✅✅ -- #
     """ """
     print(barrels_delivered)
 
@@ -43,7 +44,7 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
 
     with db.engine.begin() as connection:
         sql_query = sqlalchemy.text("""UPDATE global_inventory SET 
-                               gold = gold + :gold_paid,
+                               gold = gold - :gold_paid,
                                num_red_ml = num_red_ml + :red_ml,
                                num_green_ml = num_green_ml + :green_ml,
                                num_blue_ml = num_blue_ml + :blue_ml,
@@ -56,6 +57,7 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
 # Gets called once a day
 @router.post("/plan")
 def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
+    # -- ✅✅✅ -- #
     """ """
     print(wholesale_catalog)
 

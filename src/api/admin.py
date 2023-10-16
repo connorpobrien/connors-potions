@@ -14,6 +14,7 @@ router = APIRouter(
 
 @router.post("/reset")
 def reset():
+    # -- ✅✅✅ -- #
     """
     A call to reset shop will delete all inventory and in-flight 
     carts and reset gold back to 100.
@@ -62,6 +63,7 @@ def reset():
 
 @router.get("/shop_info/")
 def get_shop_info():
+    # -- ✅✅✅ -- #
     """ """
     return {
         "shop_name": "connors-potions",

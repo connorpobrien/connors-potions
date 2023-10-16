@@ -19,6 +19,7 @@ class PotionInventory(BaseModel):
 
 @router.post("/deliver")
 def post_deliver_bottles(potions_delivered: list[PotionInventory]):
+    # -- ✅✅✅ -- #
     """ """
     print(potions_delivered)
 
@@ -61,19 +62,10 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
 # Gets called 4 times a day
 @router.post("/plan")
 def get_bottle_plan():
+    # -- ✅✅✅ -- #
     """
     Go from barrel to bottle.
     """
-
-    '''
-    return: [
-    {
-        "potion_type": [r, g, b, d],
-        "quantity": "integer"
-    }
-    ]
-    '''
-
     bottle_plan = []
 
     with db.engine.begin() as connection:
@@ -100,7 +92,7 @@ def get_bottle_plan():
         for item in catalog:
             sku, name, quantity, price, red_ml, green_ml, blue_ml, dark_ml = item
             # if possible
-            if (inventory_red_ml >= red_ml) and (inventory_green_ml >= green_ml) and (inventory_blue_ml >= blue_ml) and (inventory_dark_ml >= dark_ml):
+            if (inventory_red_ml >= red_ml) and (inventory_green_ml >= green_ml) and (inventory_blue_ml >= blue_ml) and (inventory_dark_ml >= dark_ml) and (quantity < 5):
                 print(f"""inventory_red_ml: {inventory_red_ml} red_ml: {red_ml}, inventory_green_ml: {inventory_green_ml} green_ml: {green_ml}, inventory_blue_ml: {inventory_blue_ml} blue_ml: {blue_ml}, inventory_dark_ml: {inventory_dark_ml} dark_ml: {dark_ml}""")
                 # add to bottle plan
                 bottle_plan.append({"potion_type": [red_ml, green_ml, blue_ml, dark_ml], "quantity": 1})
