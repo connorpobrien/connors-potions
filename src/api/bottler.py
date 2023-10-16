@@ -31,10 +31,10 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
         # update catalog
         with db.engine.begin() as connection:
             # insert values into catalog - 
-            sql_query = """INSERT INTO catalog (sku, name, quantity, num_red_ml, num_green_ml, num_blue_ml, num_dark_ml)
+            sql_query = """INSERT INTO catalog (sku, name, price, quantity, num_red_ml, num_green_ml, num_blue_ml, num_dark_ml)
                             VALUES (:sku, :name, :quantity, :price, :red_ml, :green_ml, :blue_ml, :dark_ml) 
                             ON CONFLICT (sku) DO UPDATE SET quantity = catalog.quantity + :quantity"""
-            connection.execute(sqlalchemy.text(sql_query), {"sku": sku, "name": name, "quantity": quantity, "red_ml": red_ml, "green_ml": green_ml, "blue_ml": blue_ml, "dark_ml": dark_ml})
+            connection.execute(sqlalchemy.text(sql_query), {"sku": sku, "name": name, "price": 1, "quantity": quantity, "red_ml": red_ml, "green_ml": green_ml, "blue_ml": blue_ml, "dark_ml": dark_ml})
 
         # Update global_inventory
         with db.engine.begin() as connection:
