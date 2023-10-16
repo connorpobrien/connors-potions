@@ -22,18 +22,28 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
     """ """
     print(potions_delivered)
 
+    # query catalog
+    sql_query = """SELECT id, sku, name, quantity, price, num_red_ml, num_green_ml, num_blue_ml, num_dark_ml FROM catalog"""
+    catalog = db.engine.execute(sqlalchemy.text(sql_query)).fetchall()
+
     # Based on how many potions were delivered, update the catalog and global_inventory
     for potion in potions_delivered:
         red_ml, green_ml, blue_ml, dark_ml = potion.potion_type
         sku = name = f"{red_ml}_{green_ml}_{blue_ml}_{dark_ml}"
         quantity = potion.quantity
 
+        # determine id from catalog based on sku
+        for item in catalog:
+            if item.sku == sku:
+                id = item.id
+                break
+
         # update catalog
         with db.engine.begin() as connection:
-            # insert values into catalog - 
+            # insert values into catalog - conflict based on id 
             sql_query = """INSERT INTO catalog (sku, name, price, quantity, num_red_ml, num_green_ml, num_blue_ml, num_dark_ml)
                             VALUES (:sku, :name, :quantity, :price, :red_ml, :green_ml, :blue_ml, :dark_ml) 
-                            ON CONFLICT (sku) DO UPDATE SET quantity = catalog.quantity + :quantity"""
+                            ON CONFLICT (id) DO UPDATE SET quantity = catalog.quantity + :quantity"""
             connection.execute(sqlalchemy.text(sql_query), {"sku": sku, "name": name, "price": 1, "quantity": quantity, "red_ml": red_ml, "green_ml": green_ml, "blue_ml": blue_ml, "dark_ml": dark_ml})
 
         # Update global_inventory
@@ -68,15 +78,5 @@ def get_bottle_plan():
 
     # return bottle plan
 
-    
-    # [100, 0, 0, 0]
-    # [0, 100, 0, 0]
-    # [0, 0, 100, 0]
-    # [0, 0, 0, 100]
-    # [50, 50, 0, 0]
-    # [50, 0, 50, 0]
-    # [50, 0, 0, 50]
-    # [0, 50, 50, 0]
-    # [0, 50, 0, 50]
-    # [0, 0, 50, 50]
+    return "OK"
 
