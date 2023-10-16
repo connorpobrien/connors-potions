@@ -65,32 +65,66 @@ def get_bottle_plan():
     Go from barrel to bottle.
     """
 
-    # Each bottle has a quantity of what proportion of red, blue, and
-    # green potion to add.
-    # Expressed in integers from 1 to 100 that must sum up to 100.
+    '''
+    return: [
+    {
+        "potion_type": [r, g, b, d],
+        "quantity": "integer"
+    }
+    ]
+    '''
+
+    bottle_plan = []
 
     with db.engine.begin() as connection:
         # query global
         sql_query = """SELECT num_red_ml, num_green_ml, num_blue_ml, num_dark_ml FROM global_inventory"""
         global_inventory = connection.execute(sqlalchemy.text(sql_query)).first()
-        num_red_ml, num_green_ml, num_blue_ml, num_dark_ml = global_inventory
+        inventory_red_ml, inventory_green_ml, inventory_blue_ml, inventory_dark_ml = global_inventory
 
-        # query catalog
-        sql_query = """SELECT sku, name, quantity, price, num_red_ml, num_green_ml, num_blue_ml, num_dark_ml FROM catalog"""
-        catalog = connection.execute(sqlalchemy.text(sql_query)).fetchall()
+    while True:
+        with db.engine.begin() as connection:
+            # query catalog
+            sql_query = """SELECT sku, name, quantity, price, num_red_ml, num_green_ml, num_blue_ml, num_dark_ml FROM catalog"""
+            catalog = connection.execute(sqlalchemy.text(sql_query)).fetchall()
+        
+        catalog = sorted(catalog, key=lambda x: x.quantity)
 
-    # determine which bottles to make
-    # sort catalog, then iteratively create bottles until out of ml
-    catalog = sorted(catalog, key=lambda x: x.quantity)
-    print(catalog)
-    print(type(catalog))
+        # if all already have a quantity of 1, break
+        if catalog[0].quantity == 1:
+            break
 
+        i = 0
+        for item in catalog:
+            sku, name, quantity, price, red_ml, green_ml, blue_ml, dark_ml = item
+            # if possible
+            if inventory_red_ml > red_ml and inventory_green_ml > green_ml and inventory_blue_ml > blue_ml and inventory_dark_ml > dark_ml:
+                # add to bottle plan
+                bottle_plan.append({"potion_type": [red_ml, green_ml, blue_ml, dark_ml], "quantity": 1})
 
-    # update catalog
+                # update inventory
+                inventory_red_ml -= red_ml
+                inventory_green_ml -= green_ml
+                inventory_blue_ml -= blue_ml
+                inventory_dark_ml -= dark_ml
+
+                # update catalog
+                with db.engine.begin() as connection:
+                    sql_query = """UPDATE catalog SET quantity = quantity - 1 WHERE sku = :sku"""
+                    connection.execute(sqlalchemy.text(sql_query), {"sku": sku})
+
+                break
+
+        i += 1
+        if i == len(catalog):
+            break
 
     # update global
+    with db.engine.begin() as connection:
+        sql_query = """UPDATE global_inventory SET num_red_ml = :red_ml, num_green_ml = :green_ml, num_blue_ml = :blue_ml, num_dark_ml = :dark_ml"""
+        connection.execute(sqlalchemy.text(sql_query), {"red_ml": inventory_red_ml, "green_ml": inventory_green_ml, "blue_ml": inventory_blue_ml, "dark_ml": inventory_dark_ml})
 
-    # return bottle plan
+    return bottle_plan
 
-    return "OK"
+    
 
