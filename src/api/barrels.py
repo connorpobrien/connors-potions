@@ -91,47 +91,39 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     if red_ml < 100:
         for barrel in wholesale_catalog:
             if barrel.potion_type == [1, 0, 0, 0]:
-                res.append({
-                    "sku": barrel.sku,
-                    "quantity": 1,
-                })
-                # spent gold
-                gold -= barrel.price
-                print("Barrel puchased: ", barrel)
-                break
+                if gold >= barrel.price:
+                    res.append({
+                        "sku": barrel.sku,
+                        "quantity": 1,
+                    })
+                    # spent gold
+                    gold -= barrel.price
+                    print("Barrel puchased: ", barrel)
+                    break
     if green_ml < 100:
         for barrel in wholesale_catalog:
             if barrel.potion_type == [0, 1, 0, 0]:
-                res.append({
-                    "sku": barrel.sku,
-                    "quantity": 1,
-                })
-                # spent gold
-                gold -= barrel.price
-                print("Barrel puchased: ", barrel)
-                break
+                if gold >= barrel.price:
+                    res.append({
+                        "sku": barrel.sku,
+                        "quantity": 1,
+                    })
+                    # spent gold
+                    gold -= barrel.price
+                    print("Barrel puchased: ", barrel)
+                    break
     if blue_ml < 100:
         for barrel in wholesale_catalog:
             if barrel.potion_type == [0, 0, 1, 0]:
-                res.append({
-                    "sku": barrel.sku,
-                    "quantity": 1,
-                })
-                # spent gold
-                gold -= barrel.price
-                print("Barrel puchased: ", barrel)
-                break
-    if dark_ml < 100:
-        for barrel in wholesale_catalog:
-            if barrel.potion_type == [0, 0, 0, 1]:
-                res.append({
-                    "sku": barrel.sku,
-                    "quantity": 1,
-                })
-                # spent gold
-                gold -= barrel.price
-                print("Barrel puchased: ", barrel)
-                break
+                if gold >= barrel.price:
+                    res.append({
+                        "sku": barrel.sku,
+                        "quantity": 1,
+                    })
+                    # spent gold
+                    gold -= barrel.price
+                    print("Barrel puchased: ", barrel)
+                    break
 
     # iterate through rest of barrels and buy if possible
     for barrel in wholesale_catalog:

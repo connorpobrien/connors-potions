@@ -120,8 +120,8 @@ def get_bottle_plan():
         connection.execute(sqlalchemy.text(sql_query), {"red_ml": inventory_red_ml, "green_ml": inventory_green_ml, "blue_ml": inventory_blue_ml, "dark_ml": inventory_dark_ml})
 
     print(bottle_plan)
-
-    return bottle_plan
+    # return bottle plan, max length 6
+    return bottle_plan[:6]
 
     
 
