@@ -27,7 +27,11 @@ def get_inventory():
                             global_inventory;
                         """
         global_inventory = connection.execute(sqlalchemy.text(sql_query)).first()
-        gold, num_red_ml, num_green_ml, num_blue_ml, num_dark_ml = global_inventory
+        gold = global_inventory.gold
+        num_red_ml = global_inventory.num_red_ml
+        num_green_ml = global_inventory.num_green_ml
+        num_blue_ml = global_inventory.num_blue_ml
+        num_dark_ml = global_inventory.num_dark_ml
         
         # Get data from catalog
 
