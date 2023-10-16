@@ -17,7 +17,7 @@ def get_inventory():
     # Get values from database
     with db.engine.begin() as connection:
         # get data from global_inventory
-        sql_query = """SELECT gold, 
+        sql_query = """SELECT SUM(gold) as gold, 
                        SUM(num_red_ml + num_green_ml + num_blue_ml + num_dark_ml) AS ml_in_barrels
                        FROM global_inventory"""
         global_inventory = connection.execute(sqlalchemy.text(sql_query)).first()

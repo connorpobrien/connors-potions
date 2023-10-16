@@ -22,17 +22,16 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
     """ """
     print(potions_delivered)
 
-    # Based on how many potions were delivered, update the inventory
+    # Based on how many potions were delivered, update the catalog and global_inventory
     for potion in potions_delivered:
         red_ml, green_ml, blue_ml, dark_ml = potion.potion_type
         quantity = potion.quantity
 
         # update catalog
         with db.engine.begin() as connection:
-            # generate sku
-            generate_sku = (lambda: ''.join(random.choice(string.ascii_letters + string.digits + "_") 
-                for _ in range(random.randint(1, 20))))
-            # generate a sku that doesnt already exists in the database
+            # lambda function that generates a sku
+            generate_sku = (lambda: ''.join(random.choice(string.ascii_letters + string.digits + "_") for _ in range(random.randint(1, 20))))
+            # ensure sku is unique
             while True:
                 sku = generate_sku()
                 sql_query = """SELECT sku FROM catalog WHERE sku = :sku"""
@@ -40,7 +39,7 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
                 if not result.first():
                     break
             
-            # insert into catalog
+            # insert values into catalog
             pass
     
 
