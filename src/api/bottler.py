@@ -101,10 +101,7 @@ def get_bottle_plan():
             sku, name, quantity, price, red_ml, green_ml, blue_ml, dark_ml = item
             # if possible
             if (inventory_red_ml >= red_ml) and (inventory_green_ml >= green_ml) and (inventory_blue_ml >= blue_ml) and (inventory_dark_ml >= dark_ml):
-                print(f"inventory_red_ml: {inventory_red_ml} red_ml: {red_ml},
-                        inventory_green_ml: {inventory_green_ml} green_ml: {green_ml},
-                        inventory_blue_ml: {inventory_blue_ml} blue_ml: {blue_ml},
-                        inventory_dark_ml: {inventory_dark_ml} dark_ml: {dark_ml}")
+                print(f"""inventory_red_ml: {inventory_red_ml} red_ml: {red_ml}, inventory_green_ml: {inventory_green_ml} green_ml: {green_ml}, inventory_blue_ml: {inventory_blue_ml} blue_ml: {blue_ml}, inventory_dark_ml: {inventory_dark_ml} dark_ml: {dark_ml}""")
                 # add to bottle plan
                 bottle_plan.append({"potion_type": [red_ml, green_ml, blue_ml, dark_ml], "quantity": 1})
 
