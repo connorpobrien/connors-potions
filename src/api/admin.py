@@ -47,14 +47,15 @@ def reset():
                             [0, 50, 50, 0],
                             [0, 50, 0, 50],
                             [0, 0, 50, 50]] # I think more potion types will be added in future?
-        build_catalog = """INSERT INTO catalog (sku, quantity, price, num_red_ml, num_green_ml, num_blue_ml, num_dark_ml)
-                            VALUES (:sku, :quantity, :price, :red_ml, :green_ml, :blue_ml, :dark_ml)"""
+        build_catalog = """INSERT INTO catalog (sku, name, quantity, price, num_red_ml, num_green_ml, num_blue_ml, num_dark_ml)
+                            VALUES (:sku, :name, :quantity, :price, :red_ml, :green_ml, :blue_ml, :dark_ml)"""
         for i in range(10):
             sku = unique_skus.pop()
+            name = sku
             quantity = 0
             price = 1
             red_ml, green_ml, blue_ml, dark_ml = possible_potions[i]
-            connection.execute(sqlalchemy.text(build_catalog), {"sku": sku, "quantity": quantity, "price": price, "red_ml": red_ml, "green_ml": green_ml, "blue_ml": blue_ml, "dark_ml": dark_ml})
+            connection.execute(sqlalchemy.text(build_catalog), {"sku": sku, "name": name, "quantity": quantity, "price": price, "red_ml": red_ml, "green_ml": green_ml, "blue_ml": blue_ml, "dark_ml": dark_ml})
 
         # Delete all carts and cart items
         reset_carts = """DELETE FROM carts"""
