@@ -28,8 +28,7 @@ def reset():
                                                 num_dark_ml = 0"""
         connection.execute(sqlalchemy.text(reset_global_inventory))
 
-        # Clear catalog
-        # test
+        # Clear and reset catalog
         reset_catalog = """DELETE FROM catalog"""
         connection.execute(sqlalchemy.text(reset_catalog))
 
@@ -42,10 +41,10 @@ def reset():
                             [50, 0, 0, 50],
                             [0, 50, 50, 0],
                             [0, 50, 0, 50],
-                            [0, 0, 50, 50]] # I think more potion types will be added in future?
+                            [0, 0, 50, 50]] # I think more potion types will be added in future? Will adjust
         build_catalog = """INSERT INTO catalog (sku, name, quantity, price, num_red_ml, num_green_ml, num_blue_ml, num_dark_ml)
                             VALUES (:sku, :name, :quantity, :price, :red_ml, :green_ml, :blue_ml, :dark_ml)"""
-        for i in range(10):
+        for i in range(len(possible_potions)):
             red_ml, green_ml, blue_ml, dark_ml = possible_potions[i]
             sku = name = f"{red_ml}_{green_ml}_{blue_ml}_{dark_ml}"
             quantity = 0
