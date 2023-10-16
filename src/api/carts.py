@@ -89,13 +89,5 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
         sql_query = """UPDATE global_inventory SET gold = gold + :purchase_cost"""  
         connection.execute(sqlalchemy.text(sql_query), {"purchase_cost": purchase_cost})
 
-        # delete cart
-        sql_query = """DELETE FROM carts WHERE cart_id = :cart_id"""
-        connection.execute(sqlalchemy.text(sql_query), {"cart_id": cart_id})
-
-        # delete cart_items
-        sql_query = """DELETE FROM cart_items WHERE cart_id = :cart_id"""
-        connection.execute(sqlalchemy.text(sql_query), {"cart_id": cart_id})
-
     return {"total_potions_bought": 0, "total_gold_paid": purchase_cost}
 
