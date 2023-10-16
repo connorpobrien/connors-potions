@@ -69,9 +69,22 @@ def get_bottle_plan():
     # green potion to add.
     # Expressed in integers from 1 to 100 that must sum up to 100.
 
-    # query global
+    with db.engine.begin() as connection:
+        # query global
+        sql_query = """SELECT num_red_ml, num_green_ml, num_blue_ml, num_dark_ml FROM global_inventory"""
+        global_inventory = connection.execute(sqlalchemy.text(sql_query)).first()
+        num_red_ml, num_green_ml, num_blue_ml, num_dark_ml = global_inventory
 
-    # query catalog - determine which potions in catalog need more bottles
+        # query catalog
+        sql_query = """SELECT sku, name, quantity, price, num_red_ml, num_green_ml, num_blue_ml, num_dark_ml FROM catalog"""
+        catalog = connection.execute(sqlalchemy.text(sql_query)).fetchall()
+
+    # determine which bottles to make
+    # sort catalog, then iteratively create bottles until out of ml
+    catalog = sorted(catalog, key=lambda x: x.quantity)
+    print(catalog)
+    print(type(catalog))
+
 
     # update catalog
 
