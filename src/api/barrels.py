@@ -61,13 +61,79 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     """ """
     print(wholesale_catalog)
 
+    '''
+    wholesale_catalog format:
+    [
+    {
+        "sku": "string",
+        "ml_per_barrel": 100,
+        "potion_type": [
+        1, 0, 0, 0
+        ],
+        "price": 1,
+        "quantity": 1
+    }
+    ]
+    '''
+
     # get gold value from global_inventory
     with db.engine.begin() as connection:
-        sql_query = """SELECT gold from global_inventory"""
-        gold = connection.execute(sqlalchemy.text(sql_query)).first().gold
+        sql_query = """SELECT gold, num_red_ml, num_green_ml, num_blue_ml, num_dark_ml FROM global_inventory"""
+        inventory = connection.execute(sqlalchemy.text(sql_query)).first()
+        gold, red_ml, green_ml, blue_ml, dark_ml = inventory
+
+    # sort whole sale primarily by catalog ml_per_barrel, small to large
+    wholesale_catalog = sorted(wholesale_catalog, key=lambda x: x.ml_per_barrel)
+    print(wholesale_catalog)
 
     res = []
-    # iterate through barrels and buy if possible
+    # if any of red, green, blue, or dark are less than 100 in global inventory, buy the smallest barrel of that type
+    if red_ml < 100:
+        for barrel in wholesale_catalog:
+            if barrel.potion_type == [1, 0, 0, 0]:
+                res.append({
+                    "sku": barrel.sku,
+                    "quantity": 1,
+                })
+                # spent gold
+                gold -= barrel.price
+                print("Barrel puchased: ", barrel)
+                break
+    if green_ml < 100:
+        for barrel in wholesale_catalog:
+            if barrel.potion_type == [0, 1, 0, 0]:
+                res.append({
+                    "sku": barrel.sku,
+                    "quantity": 1,
+                })
+                # spent gold
+                gold -= barrel.price
+                print("Barrel puchased: ", barrel)
+                break
+    if blue_ml < 100:
+        for barrel in wholesale_catalog:
+            if barrel.potion_type == [0, 0, 1, 0]:
+                res.append({
+                    "sku": barrel.sku,
+                    "quantity": 1,
+                })
+                # spent gold
+                gold -= barrel.price
+                print("Barrel puchased: ", barrel)
+                break
+    if dark_ml < 100:
+        for barrel in wholesale_catalog:
+            if barrel.potion_type == [0, 0, 0, 1]:
+                res.append({
+                    "sku": barrel.sku,
+                    "quantity": 1,
+                })
+                # spent gold
+                gold -= barrel.price
+                print("Barrel puchased: ", barrel)
+                break
+
+    # iterate through rest of barrels and buy if possible
     for barrel in wholesale_catalog:
         if barrel.price <= gold:
             res.append({
