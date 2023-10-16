@@ -29,6 +29,7 @@ def reset():
         connection.execute(sqlalchemy.text(reset_global_inventory))
 
         # Clear catalog
+        # test
         reset_catalog = """DELETE FROM catalog"""
         connection.execute(sqlalchemy.text(reset_catalog))
 
