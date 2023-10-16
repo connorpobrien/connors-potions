@@ -15,6 +15,7 @@ class NewCart(BaseModel):
 
 @router.post("/")
 def create_cart(new_cart: NewCart):
+    # -- ✅✅✅ -- #
     """ Creates a new cart for a specific customer. """
     with db.engine.begin() as connection:
         sql_query = """INSERT INTO carts (customer_name)
@@ -32,11 +33,12 @@ def create_cart(new_cart: NewCart):
 def get_cart(cart_id: int):
     """ Returns the items in a customer's cart."""
     # retrieve customer's cart based on the cart_id from cart_items table
-    with db.engine.begin() as connection:
-        sql_query = """SELECT item_sku, quantity FROM cart_items WHERE cart_id = :cart_id"""
-        result = connection.execute(sqlalchemy.text(sql_query), {"cart_id": cart_id})
-        cart_items = result.fetchall()
-    return cart_items
+    # with db.engine.begin() as connection:
+    #     sql_query = """SELECT item_sku, quantity FROM cart_items WHERE cart_id = :cart_id"""
+    #     result = connection.execute(sqlalchemy.text(sql_query), {"cart_id": cart_id})
+    #     cart_items = result.fetchall()
+    # return cart_items
+    return {}
 
     
 class CartItem(BaseModel):
@@ -77,18 +79,25 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
         result = connection.execute(sqlalchemy.text(sql_query), {"cart_id": cart_id})
         cart_items = result.fetchall()
 
-        # update catalog
-        for potion in cart_items:
-            pass
-            
+        total_gold_paid = 0
+        total_potions_bought = 0
 
-        # calculate purchase amount - join with catalog
+        for item_sku, quantity in cart_items:
+            # get price from catalog, add to total gold paid
+            sql_query = """SELECT price FROM catalog WHERE sku = :item_sku"""
+            result = connection.execute(sqlalchemy.text(sql_query), {"item_sku": item_sku})
+            total_gold_paid += result.first().price * quantity
+            total_potions_bought += quantity
 
-        purchase_cost = 0
+            # decrease quantity in catalog table
+            sql_query = """UPDATE catalog SET quantity = quantity - :quantity WHERE sku = :item_sku"""
+            connection.execute(sqlalchemy.text(sql_query), {"quantity": quantity, "item_sku": item_sku})
+
+            # remove items from cart_items
+            sql_query = """DELETE FROM cart_items WHERE cart_id = :cart_id AND item_sku = :item_sku"""
 
         # update gold in global_inventory
-        sql_query = """UPDATE global_inventory SET gold = gold + :purchase_cost"""  
-        connection.execute(sqlalchemy.text(sql_query), {"purchase_cost": purchase_cost})
+        sql_query = """UPDATE global_inventory SET gold = gold + :total_gold_paid"""
 
-    return {"total_potions_bought": 0, "total_gold_paid": purchase_cost}
+    return {"total_potions_bought": total_potions_bought, "total_gold_paid": total_gold_paid}
 
