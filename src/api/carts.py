@@ -79,7 +79,7 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
 
         # update catalog
         for potion in cart_items:
-            pass
+            
 
         # calculate purchase amount - join with catalog
 
