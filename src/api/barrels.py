@@ -25,6 +25,11 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
     # -- ✅✅✅ -- #
     """ """
     print(barrels_delivered)
+    # store in prints table
+    with db.engine.begin() as connection:
+        sql_query = """INSERT INTO prints (category, print_statement)
+                        VALUES ('barrels', :barrels_delivered)"""
+        connection.execute(sqlalchemy.text(sql_query), {"barrels_delivered": barrels_delivered})
 
     gold_paid, red_ml, green_ml, blue_ml, dark_ml = 0, 0, 0, 0, 0
     for barrel_delivered in barrels_delivered:
