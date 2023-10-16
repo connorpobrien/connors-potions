@@ -31,12 +31,6 @@ def reset():
         reset_catalog = """DELETE FROM catalog"""
         connection.execute(sqlalchemy.text(reset_catalog))
 
-        # repopulate catalog
-        generate_sku = (lambda: ''.join(random.choice(string.ascii_letters + string.digits + "_") for _ in range(random.randint(1, 20)))) # Matching regex ^[a-zA-Z0-9_]{1,20}$
-        random_skus = set()
-        for _ in range(100):
-            random_skus.add(generate_sku())
-        unique_skus = list(random_skus) 
         possible_potions = [[100, 0, 0, 0],
                             [0, 100, 0, 0],
                             [0, 0, 100, 0],
@@ -50,11 +44,10 @@ def reset():
         build_catalog = """INSERT INTO catalog (sku, name, quantity, price, num_red_ml, num_green_ml, num_blue_ml, num_dark_ml)
                             VALUES (:sku, :name, :quantity, :price, :red_ml, :green_ml, :blue_ml, :dark_ml)"""
         for i in range(10):
-            sku = unique_skus.pop()
-            name = sku
+            red_ml, green_ml, blue_ml, dark_ml = possible_potions[i]
+            sku = name = f"{red_ml}_{green_ml}_{blue_ml}_{dark_ml}"
             quantity = 0
             price = 1
-            red_ml, green_ml, blue_ml, dark_ml = possible_potions[i]
             connection.execute(sqlalchemy.text(build_catalog), {"sku": sku, "name": name, "quantity": quantity, "price": price, "red_ml": red_ml, "green_ml": green_ml, "blue_ml": blue_ml, "dark_ml": dark_ml})
 
         # Delete all carts and cart items

@@ -25,23 +25,16 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
     # Based on how many potions were delivered, update the catalog and global_inventory
     for potion in potions_delivered:
         red_ml, green_ml, blue_ml, dark_ml = potion.potion_type
+        sku = name = f"{red_ml}_{green_ml}_{blue_ml}_{dark_ml}"
         quantity = potion.quantity
 
         # update catalog
         with db.engine.begin() as connection:
-            # lambda function that generates a sku
-            generate_sku = (lambda: ''.join(random.choice(string.ascii_letters + string.digits + "_") for _ in range(random.randint(1, 20))))
-            # ensure sku is unique
-            while True:
-                sku = generate_sku()
-                sql_query = """SELECT sku FROM catalog WHERE sku = :sku"""
-                result = connection.execute(sqlalchemy.text(sql_query), {"sku": sku})
-                if not result.first():
-                    break
-            
-            # insert values into catalog
-            pass
-    
+            # insert values into catalog - 
+            sql_query = """INSERT INTO catalog (sku, name, quantity, num_red_ml, num_green_ml, num_blue_ml, num_dark_ml)
+                            VALUES (:sku, :name, :quantity, :price, :red_ml, :green_ml, :blue_ml, :dark_ml) 
+                            ON CONFLICT (sku) DO UPDATE SET quantity = catalog.quantity + :quantity"""
+            connection.execute(sqlalchemy.text(sql_query), {"sku": sku, "name": name, "quantity": quantity, "red_ml": red_ml, "green_ml": green_ml, "blue_ml": blue_ml, "dark_ml": dark_ml})
 
         # Update global_inventory
         with db.engine.begin() as connection:
