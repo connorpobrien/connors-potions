@@ -47,6 +47,7 @@ class CartItem(BaseModel):
 
 @router.post("/{cart_id}/items/{item_sku}")
 def set_item_quantity(cart_id: int, item_sku: str, cart_item: CartItem):
+    # -- ✅✅✅ -- #
     """ Updates the quantity of a specific item in a cart. """
 
     with db.engine.begin() as connection:
@@ -72,6 +73,7 @@ class CartCheckout(BaseModel):
 
 @router.post("/{cart_id}/checkout")
 def checkout(cart_id: int, cart_checkout: CartCheckout):
+    # -- ✅✅✅ -- #
     """ Handles the checkout process for a specific cart. """
     # Get the items in the cart
     with db.engine.begin() as connection:
