@@ -65,6 +65,11 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     # -- ✅✅✅ -- #
     """ """
     print(wholesale_catalog)
+    # store in prints table
+    with db.engine.begin() as connection:
+        sql_query = """INSERT INTO prints (category, print_statement)
+                        VALUES ('wholesale_catalog', :wholesale_catalog)"""
+        connection.execute(sqlalchemy.text(sql_query), {"wholesale_catalog": wholesale_catalog})
 
     '''
     wholesale_catalog format:
