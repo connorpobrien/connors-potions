@@ -76,11 +76,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
             })
             # spent gold
             gold -= barrel.price
-            
-    # Update global_inventory with new gold value
-    with db.engine.begin() as connection:
-        query = sqlalchemy.text("""UPDATE global_inventory SET gold = :gold""")
-        connection.execute(query, {"gold": gold})
+            print("Barrel puchased: ", barrel)
     
     return res
         

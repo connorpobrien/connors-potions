@@ -90,7 +90,7 @@ def get_bottle_plan():
 
         updated = False  # flag to check if any row was updated in this iteration
         for item in catalog:
-            sku, name, quantity, price, red_ml, green_ml, blue_ml, dark_ml = item
+            sku, name, price, red_ml, green_ml, blue_ml, dark_ml, quantity = item
             # if possible
             if (inventory_red_ml >= red_ml) and (inventory_green_ml >= green_ml) and (inventory_blue_ml >= blue_ml) and (inventory_dark_ml >= dark_ml) and (quantity < 5):
                 print(f"""inventory_red_ml: {inventory_red_ml} red_ml: {red_ml}, inventory_green_ml: {inventory_green_ml} green_ml: {green_ml}, inventory_blue_ml: {inventory_blue_ml} blue_ml: {blue_ml}, inventory_dark_ml: {inventory_dark_ml} dark_ml: {dark_ml}""")
@@ -113,44 +113,6 @@ def get_bottle_plan():
 
         if not updated:  # if no row was updated, break the loop
             break
-
-
-    # while True:
-    #     with db.engine.begin() as connection:
-    #         # query catalog
-    #         sql_query = """SELECT sku, name, quantity, price, num_red_ml, num_green_ml, num_blue_ml, num_dark_ml FROM catalog"""
-    #         catalog = connection.execute(sqlalchemy.text(sql_query)).fetchall()
-        
-    #     catalog = sorted(catalog, key=lambda x: x.quantity)
-
-    #     # if all already have a quantity of 1, break
-    #     if catalog[0].quantity == 1:
-    #         break
-
-    #     i = 0
-    #     for item in catalog:
-    #         sku, name, quantity, price, red_ml, green_ml, blue_ml, dark_ml = item
-    #         # if possible
-    #         if inventory_red_ml > red_ml and inventory_green_ml > green_ml and inventory_blue_ml > blue_ml and inventory_dark_ml > dark_ml:
-    #             # add to bottle plan
-    #             bottle_plan.append({"potion_type": [red_ml, green_ml, blue_ml, dark_ml], "quantity": 1})
-
-    #             # update inventory
-    #             inventory_red_ml -= red_ml
-    #             inventory_green_ml -= green_ml
-    #             inventory_blue_ml -= blue_ml
-    #             inventory_dark_ml -= dark_ml
-
-    #             # update catalog
-    #             with db.engine.begin() as connection:
-    #                 sql_query = """UPDATE catalog SET quantity = quantity - 1 WHERE sku = :sku"""
-    #                 connection.execute(sqlalchemy.text(sql_query), {"sku": sku})
-
-    #             break
-
-    #     i += 1
-    #     if i == len(catalog):
-    #         break
 
     # update global
     with db.engine.begin() as connection:
