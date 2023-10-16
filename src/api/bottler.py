@@ -90,6 +90,7 @@ def get_bottle_plan():
         
         # sort to find potions to replenish
         catalog = sorted(catalog, key=lambda x: x.quantity)
+        print(catalog)
 
         # if all potions already in stock
         if all(item.quantity != 0 for item in catalog):
