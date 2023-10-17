@@ -73,51 +73,35 @@ def get_bottle_plan():
         sql_query = """SELECT num_red_ml, num_green_ml, num_blue_ml, num_dark_ml FROM global_inventory"""
         global_inventory = connection.execute(sqlalchemy.text(sql_query)).first()
         inventory_red_ml, inventory_green_ml, inventory_blue_ml, inventory_dark_ml = global_inventory
+        print(f'''Inventory: red_ml: {inventory_red_ml} green_ml: {inventory_green_ml} blue_ml: {inventory_blue_ml} dark_ml: {inventory_dark_ml}''')
 
-    while True:
-        with db.engine.begin() as connection:
-            # query catalog
-            sql_query = """SELECT sku, name, quantity, price, num_red_ml, num_green_ml, num_blue_ml, num_dark_ml FROM catalog"""
-            catalog = connection.execute(sqlalchemy.text(sql_query)).fetchall()
-        
-        # sort to find potions to replenish
-        catalog = sorted(catalog, key=lambda x: x.quantity)
-        print(catalog)
-
-        # if all potions already in stock
-        if all(item.quantity != 0 for item in catalog):
-            break
-
-        updated = False  # flag to check if any row was updated in this iteration
-        for item in catalog:
-            sku, name, price, red_ml, green_ml, blue_ml, dark_ml, quantity = item
-            # if possible
-            if (inventory_red_ml >= red_ml) and (inventory_green_ml >= green_ml) and (inventory_blue_ml >= blue_ml) and (inventory_dark_ml >= dark_ml) and (quantity < 5):
-                print(f"""inventory_red_ml: {inventory_red_ml} red_ml: {red_ml}, inventory_green_ml: {inventory_green_ml} green_ml: {green_ml}, inventory_blue_ml: {inventory_blue_ml} blue_ml: {blue_ml}, inventory_dark_ml: {inventory_dark_ml} dark_ml: {dark_ml}""")
-                # add to bottle plan
-                bottle_plan.append({"potion_type": [red_ml, green_ml, blue_ml, dark_ml], "quantity": 1})
-
-                # update inventory
-                inventory_red_ml -= red_ml
-                inventory_green_ml -= green_ml
-                inventory_blue_ml -= blue_ml
-                inventory_dark_ml -= dark_ml
-
-                # update catalog
-                with db.engine.begin() as connection:
-                    sql_query = """UPDATE catalog SET quantity = quantity + 1 WHERE sku = :sku"""
-                    connection.execute(sqlalchemy.text(sql_query), {"sku": sku})
-
-                updated = True
-                break
-
-        if not updated:  # if no row was updated, break the loop
-            break
-
-    # update global
     with db.engine.begin() as connection:
-        sql_query = """UPDATE global_inventory SET num_red_ml = :red_ml, num_green_ml = :green_ml, num_blue_ml = :blue_ml, num_dark_ml = :dark_ml"""
-        connection.execute(sqlalchemy.text(sql_query), {"red_ml": inventory_red_ml, "green_ml": inventory_green_ml, "blue_ml": inventory_blue_ml, "dark_ml": inventory_dark_ml})
+        # query catalog
+        sql_query = """SELECT sku, name, quantity, price, num_red_ml, num_green_ml, num_blue_ml, num_dark_ml FROM catalog"""
+        catalog = connection.execute(sqlalchemy.text(sql_query)).fetchall()
+        
+    
+    # sort to find potions to replenish
+    catalog = sorted(catalog, key=lambda x: x.quantity)
+    print(catalog)
+
+    # if all potions already in stock
+    if all(item.quantity != 0 for item in catalog):
+        return []
+
+    for item in catalog:
+        sku, name, quantity, price, red_ml, green_ml, blue_ml, dark_ml = item
+        # if possible
+        if (inventory_red_ml >= red_ml) and (inventory_green_ml >= green_ml) and (inventory_blue_ml >= blue_ml) and (inventory_dark_ml >= dark_ml) and (quantity < 1):
+            print(f"""inventory_red_ml: {inventory_red_ml} red_ml: {red_ml}, inventory_green_ml: {inventory_green_ml} green_ml: {green_ml}, inventory_blue_ml: {inventory_blue_ml} blue_ml: {blue_ml}, inventory_dark_ml: {inventory_dark_ml} dark_ml: {dark_ml}""")
+            # add to bottle plan
+            bottle_plan.append({"potion_type": [red_ml, green_ml, blue_ml, dark_ml], "quantity": 1})
+
+            # update inventory
+            inventory_red_ml -= red_ml
+            inventory_green_ml -= green_ml
+            inventory_blue_ml -= blue_ml
+            inventory_dark_ml -= dark_ml
 
     print(bottle_plan)
     # return bottle plan, max length 6
