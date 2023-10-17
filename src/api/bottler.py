@@ -51,10 +51,10 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
         # Update global_inventory
         with db.engine.begin() as connection:
             sql_query = f"""UPDATE global_inventory SET 
-                            num_red_ml = num_red_ml + :red_ml,
-                            num_green_ml = num_green_ml + :green_ml,
-                            num_blue_ml = num_blue_ml + :blue_ml,
-                            num_dark_ml = num_dark_ml + :dark_ml"""
+                            num_red_ml = num_red_ml - :red_ml,
+                            num_green_ml = num_green_ml - :green_ml,
+                            num_blue_ml = num_blue_ml - :blue_ml,
+                            num_dark_ml = num_dark_ml - :dark_ml"""
             connection.execute(sqlalchemy.text(sql_query), {"red_ml": red_ml * quantity, "green_ml": green_ml * quantity, "blue_ml": blue_ml * quantity, "dark_ml": dark_ml * quantity})
 
     return "OK"
