@@ -34,6 +34,7 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
                         VALUES ('barrels', :barrels_delivered)"""
         connection.execute(sqlalchemy.text(sql_query), {"barrels_delivered": barrels_json})
 
+    # count gold paid and ml delivered
     gold_paid, red_ml, green_ml, blue_ml, dark_ml = 0, 0, 0, 0, 0
     for barrel_delivered in barrels_delivered:
         gold_paid += barrel_delivered.price * barrel_delivered.quantity
@@ -50,6 +51,7 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
         
     print(f"gold_paid: {gold_paid} red_ml: {red_ml} green_ml: {green_ml} blue_ml: {blue_ml} dark_ml: {dark_ml}")
 
+    # update global_inventory based on barrels that were delivered
     with db.engine.begin() as connection:
         sql_query = sqlalchemy.text("""UPDATE global_inventory SET 
                                gold = gold - :gold_paid,
@@ -73,22 +75,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     with db.engine.begin() as connection:
         sql_query = """INSERT INTO prints (category, print_statement)
                         VALUES ('wholesale_catalog', :wholesale_catalog)"""
-        connection.execute(sqlalchemy.text(sql_query), {"wholesale_catalog": wholesale_catalog})
-
-    '''
-    wholesale_catalog format:
-    [
-    {
-        "sku": "string",
-        "ml_per_barrel": 100,
-        "potion_type": [
-        1, 0, 0, 0
-        ],
-        "price": 1,
-        "quantity": 1
-    }
-    ]
-    '''
+        connection.execute(sqlalchemy.text(sql_query), {"wholesale_catalog": wholesale_catalog_json})
 
     # get gold value from global_inventory
     with db.engine.begin() as connection:
@@ -98,7 +85,6 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
 
     # sort whole sale primarily by catalog ml_per_barrel, small to large
     wholesale_catalog = sorted(wholesale_catalog, key=lambda x: x.ml_per_barrel)
-    print(wholesale_catalog)
 
     res = []
     # if any of red, green, blue, or dark are less than 100 in global inventory, buy the smallest barrel of that type
