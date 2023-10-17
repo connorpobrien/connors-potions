@@ -49,7 +49,7 @@ def reset():
             red_ml, green_ml, blue_ml, dark_ml = possible_potions[i]
             sku = name = f"{red_ml}_{green_ml}_{blue_ml}_{dark_ml}"
             quantity = 0
-            price = 100
+            price = 150
             connection.execute(sqlalchemy.text(build_catalog), {"sku": sku, "name": name, "quantity": quantity, "price": price, "red_ml": red_ml, "green_ml": green_ml, "blue_ml": blue_ml, "dark_ml": dark_ml})
 
         print("Reset catalog - Success")
