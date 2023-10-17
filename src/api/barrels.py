@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from src.api import auth
 import sqlalchemy
 from src import database as db
+import json
 
 
 router = APIRouter(
@@ -23,13 +24,15 @@ class Barrel(BaseModel):
 @router.post("/deliver")
 def post_deliver_barrels(barrels_delivered: list[Barrel]):
     # -- ✅✅✅ -- #
-    """ """
+    """ barrels_delivered format: 
+    """
     print(barrels_delivered)
     # store in prints table
+    barrels_json = json.dumps([barrel.dict() for barrel in barrels_delivered])
     with db.engine.begin() as connection:
         sql_query = """INSERT INTO prints (category, print_statement)
                         VALUES ('barrels', :barrels_delivered)"""
-        connection.execute(sqlalchemy.text(sql_query), {"barrels_delivered": barrels_delivered})
+        connection.execute(sqlalchemy.text(sql_query), {"barrels_delivered": barrels_json})
 
     gold_paid, red_ml, green_ml, blue_ml, dark_ml = 0, 0, 0, 0, 0
     for barrel_delivered in barrels_delivered:
@@ -66,6 +69,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     """ """
     print(wholesale_catalog)
     # store in prints table
+    wholesale_catalog_json = json.dumps([barrel.dict() for barrel in wholesale_catalog])
     with db.engine.begin() as connection:
         sql_query = """INSERT INTO prints (category, print_statement)
                         VALUES ('wholesale_catalog', :wholesale_catalog)"""
