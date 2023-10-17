@@ -89,7 +89,7 @@ def get_bottle_plan():
     if all(item.quantity != 0 for item in catalog):
         return []
     
-    # prioritize creating mixed potions
+    # prioritize creating mixed potions for now - 
     for item in catalog:
         sku, name, quantity, price, red_ml, green_ml, blue_ml, dark_ml = item
         if red_ml == 50 and green_ml == 50:
@@ -143,6 +143,8 @@ def get_bottle_plan():
             inventory_green_ml -= green_ml
             inventory_blue_ml -= blue_ml
             inventory_dark_ml -= dark_ml
+        if len(bottle_plan) == 6:
+            break
 
     print(bottle_plan)
     # return bottle plan, max length 6
