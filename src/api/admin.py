@@ -14,7 +14,6 @@ router = APIRouter(
 
 @router.post("/reset")
 def reset():
-    # -- ✅✅✅ -- #
     """
     A call to reset shop will delete all inventory and in-flight 
     carts and reset gold back to 100.
@@ -29,10 +28,11 @@ def reset():
         connection.execute(sqlalchemy.text(reset_global_inventory))
         print("Reset global inventory - Success")
 
-        # Clear and reset catalog
+        # Clear catalog
         reset_catalog = """DELETE FROM catalog"""
         connection.execute(sqlalchemy.text(reset_catalog))
 
+        # Rebuild catalog
         possible_potions = [[100, 0, 0, 0],
                             [0, 100, 0, 0],
                             [0, 0, 100, 0],
@@ -49,7 +49,7 @@ def reset():
             red_ml, green_ml, blue_ml, dark_ml = possible_potions[i]
             sku = name = f"{red_ml}_{green_ml}_{blue_ml}_{dark_ml}"
             quantity = 0
-            price = 150
+            price = 75
             connection.execute(sqlalchemy.text(build_catalog), {"sku": sku, "name": name, "quantity": quantity, "price": price, "red_ml": red_ml, "green_ml": green_ml, "blue_ml": blue_ml, "dark_ml": dark_ml})
 
         print("Reset catalog - Success")
@@ -70,8 +70,6 @@ def reset():
 
 @router.get("/shop_info/")
 def get_shop_info():
-    # -- ✅✅✅ -- #
-    """ """
     print("Get shop info - Success")
     return {
         "shop_name": "connors-potions",

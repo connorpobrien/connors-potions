@@ -13,8 +13,7 @@ router = APIRouter(
 
 @router.get("/inventory")
 def get_inventory():
-    # -- ✅✅✅ -- #
-    """ """
+    """"""
     # Get values from database
     with db.engine.begin() as connection:
         # get data from global_inventory
@@ -27,8 +26,7 @@ def get_inventory():
         sql_query = """SELECT SUM(quantity) AS total_potions FROM catalog"""
         total_potions = connection.execute(sqlalchemy.text(sql_query)).first().total_potions
 
-    print("Get inventory - Success")
-    print(f"gold: {gold} total_potions: {total_potions} total_ml: {total_ml}")
+    print(f'''CURRENT INVENTORY: \n number_of_potions: {total_potions} \n ml_in_barrels: {total_ml} \n gold: {gold}''')
     
     return {"number_of_potions": total_potions, "ml_in_barrels": total_ml, "gold": gold}
 
@@ -42,6 +40,5 @@ class Result(BaseModel):
 def post_audit_results(audit_explanation: Result):
     # -- ✅✅✅ -- #
     """ """
-    print(audit_explanation)
-
+    print(f'''AUDIT: \n gold_match: {audit_explanation.gold_match} \n barrels_match: {audit_explanation.barrels_match} \n potions_match: {audit_explanation.potions_match}''')
     return "OK"

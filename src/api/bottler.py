@@ -19,9 +19,10 @@ class PotionInventory(BaseModel):
 
 @router.post("/deliver")
 def post_deliver_bottles(potions_delivered: list[PotionInventory]):
-    # -- ✅✅✅ -- #
-    """ """
-    print(potions_delivered)
+    """"""
+    print("Bottles Delivered!")
+    for potion in potions_delivered:
+        print(f'''potion_type: {potion.potion_type} \n quantity: {potion.quantity}''')
 
     # query catalog
     with db.engine.begin() as connection:
@@ -62,7 +63,6 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
 # Gets called 4 times a day
 @router.post("/plan")
 def get_bottle_plan():
-    # -- ✅✅✅ -- #
     """
     Go from barrel to bottle.
     """
@@ -83,7 +83,6 @@ def get_bottle_plan():
     
     # sort to find potions to replenish
     catalog = sorted(catalog, key=lambda x: x.quantity)
-    print(catalog)
 
     # if all potions already in stock
     if all(item.quantity != 0 for item in catalog):
@@ -146,7 +145,10 @@ def get_bottle_plan():
         if len(bottle_plan) == 6:
             break
 
-    print(bottle_plan)
+    # print bottle plan
+    for bottle in bottle_plan:
+        print(f'''potion_type: {bottle["potion_type"]} quantity: {bottle["quantity"]}''')
+
     # return bottle plan, max length 6
     return bottle_plan[:6]
 

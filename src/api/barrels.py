@@ -14,19 +14,19 @@ router = APIRouter(
 
 class Barrel(BaseModel):
     sku: str
-
     ml_per_barrel: int
     potion_type: list[int]
     price: int
-
     quantity: int
 
 @router.post("/deliver")
 def post_deliver_barrels(barrels_delivered: list[Barrel]):
     # -- ✅✅✅ -- #
-    """ barrels_delivered format: 
-    """
-    print(barrels_delivered)
+    # For each barrel delivered, print
+    print("Barrels Delivered!")
+    for barrel in barrels_delivered:
+        print(f'''sku: {barrel.sku} \n ml_per_barrel: {barrel.ml_per_barrel} \n potion_type: {barrel.potion_type} \n price: {barrel.price} \n quantity: {barrel.quantity}''')
+
     # store in prints table
     barrels_json = json.dumps([barrel.dict() for barrel in barrels_delivered])
     with db.engine.begin() as connection:
@@ -49,7 +49,7 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
         else:
             raise Exception("Invalid potion type")
         
-    print(f"gold_paid: {gold_paid} red_ml: {red_ml} green_ml: {green_ml} blue_ml: {blue_ml} dark_ml: {dark_ml}")
+    print(f"BARRELS DELIEVERD! \n gold_paid: {gold_paid} \n red_ml_received: {red_ml} \n green_ml_received: {green_ml} \n blue_ml_received: {blue_ml} \n dark_ml_received: {dark_ml}")
 
     # update global_inventory based on barrels that were delivered
     with db.engine.begin() as connection:
@@ -61,6 +61,8 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
                                num_dark_ml = num_dark_ml + :dark_ml""")
         connection.execute(sql_query, {"gold_paid": gold_paid, "red_ml": red_ml, "green_ml": green_ml, "blue_ml": blue_ml, "dark_ml": dark_ml})
     
+    print("Global inventory updated - Success")
+    
     return "OK"
 
     
@@ -69,7 +71,10 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
 def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     # -- ✅✅✅ -- #
     """ """
-    print(wholesale_catalog)
+    print("Wholesale Catalog: ")
+    for barrel in wholesale_catalog:
+        print(f'''sku: {barrel.sku} \n ml_per_barrel: {barrel.ml_per_barrel} \n potion_type: {barrel.potion_type} \n price: {barrel.price} \n quantity: {barrel.quantity}''')
+
     # store in prints table
     wholesale_catalog_json = json.dumps([barrel.dict() for barrel in wholesale_catalog])
     with db.engine.begin() as connection:
@@ -82,6 +87,8 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
         sql_query = """SELECT gold, num_red_ml, num_green_ml, num_blue_ml, num_dark_ml FROM global_inventory"""
         inventory = connection.execute(sqlalchemy.text(sql_query)).first()
         gold, red_ml, green_ml, blue_ml, dark_ml = inventory
+
+    print(f'''Current global inventory: \n gold: {gold} \n red_ml: {red_ml} \n green_ml: {green_ml} \n blue_ml: {blue_ml} \n dark_ml: {dark_ml}''')
 
     # sort whole sale primarily by catalog ml_per_barrel, small to large
     wholesale_catalog = sorted(wholesale_catalog, key=lambda x: x.ml_per_barrel)
@@ -98,7 +105,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
                     })
                     # spent gold
                     gold -= barrel.price
-                    print("Barrel puchased: ", barrel)
+                    print(f'''Barrel added to purchase plan: \n sku: {barrel.sku} \n ml_per_barrel: {barrel.ml_per_barrel} \n potion_type: {barrel.potion_type} \n price: {barrel.price} \n quantity: 1''')
                     break
     if green_ml < 100:
         for barrel in wholesale_catalog:
@@ -110,7 +117,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
                     })
                     # spent gold
                     gold -= barrel.price
-                    print("Barrel puchased: ", barrel)
+                    print(f'''Barrel added to purchase plan: \n sku: {barrel.sku} \n ml_per_barrel: {barrel.ml_per_barrel} \n potion_type: {barrel.potion_type} \n price: {barrel.price} \n quantity: 1''')
                     break
     if blue_ml < 100:
         for barrel in wholesale_catalog:
@@ -122,7 +129,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
                     })
                     # spent gold
                     gold -= barrel.price
-                    print("Barrel puchased: ", barrel)
+                    print(f'''Barrel added to purchase plan: \n sku: {barrel.sku} \n ml_per_barrel: {barrel.ml_per_barrel} \n potion_type: {barrel.potion_type} \n price: {barrel.price} \n quantity: 1''')
                     break
 
     # iterate through rest of barrels and buy if possible
@@ -134,7 +141,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
             })
             # spent gold
             gold -= barrel.price
-            print("Barrel puchased: ", barrel)
-    
+            print(f'''Barrel added to purchase plan: \n sku: {barrel.sku} \n ml_per_barrel: {barrel.ml_per_barrel} \n potion_type: {barrel.potion_type} \n price: {barrel.price} \n quantity: 1''')
+
     return res
         
