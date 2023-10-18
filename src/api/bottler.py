@@ -78,7 +78,7 @@ def get_bottle_plan():
     if all(item.quantity != 0 for item in catalog):
         return []
     
-    # prioritize creating mixed potions for now - 
+    # prioritize creating mixed potions for now
     for item in catalog:
         sku, name, quantity, price, red_ml, green_ml, blue_ml, dark_ml = item
         if red_ml == 50 and green_ml == 50:

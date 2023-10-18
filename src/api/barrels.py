@@ -21,7 +21,6 @@ class Barrel(BaseModel):
 
 @router.post("/deliver")
 def post_deliver_barrels(barrels_delivered: list[Barrel]):
-    # -- ✅✅✅ -- #
     # For each barrel delivered, print
     print("Barrels Delivered!")
     for barrel in barrels_delivered:
@@ -69,7 +68,6 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
 # Gets called once a day
 @router.post("/plan")
 def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
-    # -- ✅✅✅ -- #
     """ """
     print("Wholesale Catalog: ")
     for barrel in wholesale_catalog:
@@ -98,25 +96,27 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     if red_ml < 100:
         for barrel in wholesale_catalog:
             if barrel.potion_type == [1, 0, 0, 0]:
-                if gold >= barrel.price:
+                if gold >= barrel.price and barrel.quantity > 0:
                     res.append({
                         "sku": barrel.sku,
                         "quantity": 1,
                     })
                     # spent gold
                     gold -= barrel.price
+                    barrel.quantity -= 1
                     print(f'''Barrel added to purchase plan: \n sku: {barrel.sku} \n ml_per_barrel: {barrel.ml_per_barrel} \n potion_type: {barrel.potion_type} \n price: {barrel.price} \n quantity: 1''')
                     break
     if green_ml < 100:
         for barrel in wholesale_catalog:
             if barrel.potion_type == [0, 1, 0, 0]:
-                if gold >= barrel.price:
+                if gold >= barrel.price and barrel.quantity > 0:
                     res.append({
                         "sku": barrel.sku,
                         "quantity": 1,
                     })
                     # spent gold
                     gold -= barrel.price
+                    barrel.quantity -= 1
                     print(f'''Barrel added to purchase plan: \n sku: {barrel.sku} \n ml_per_barrel: {barrel.ml_per_barrel} \n potion_type: {barrel.potion_type} \n price: {barrel.price} \n quantity: 1''')
                     break
     if blue_ml < 100:
@@ -129,18 +129,20 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
                     })
                     # spent gold
                     gold -= barrel.price
+                    barrel.quantity -= 1
                     print(f'''Barrel added to purchase plan: \n sku: {barrel.sku} \n ml_per_barrel: {barrel.ml_per_barrel} \n potion_type: {barrel.potion_type} \n price: {barrel.price} \n quantity: 1''')
                     break
 
     # iterate through rest of barrels and buy if possible
     for barrel in wholesale_catalog:
-        if barrel.price <= gold:
+        if barrel.price <= gold and barrel.quantity > 0:
             res.append({
                 "sku": barrel.sku,
                 "quantity": 1, # only buying one for now
             })
             # spent gold
             gold -= barrel.price
+            barrel.quantity -= 1
             print(f'''Barrel added to purchase plan: \n sku: {barrel.sku} \n ml_per_barrel: {barrel.ml_per_barrel} \n potion_type: {barrel.potion_type} \n price: {barrel.price} \n quantity: 1''')
 
     return res
