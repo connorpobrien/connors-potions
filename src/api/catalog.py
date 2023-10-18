@@ -6,7 +6,6 @@ router = APIRouter()
 
 @router.get("/catalog/", tags=["catalog"])
 def get_catalog():
-    # -- ✅✅✅ -- #
     """
     Retrieves the catalog of items. Each unique item combination must have only a single price.
     """

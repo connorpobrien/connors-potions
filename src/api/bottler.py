@@ -70,7 +70,6 @@ def get_bottle_plan():
         sql_query = """SELECT sku, name, quantity, price, num_red_ml, num_green_ml, num_blue_ml, num_dark_ml FROM catalog"""
         catalog = connection.execute(sqlalchemy.text(sql_query)).fetchall()
         
-    
     # sort to find potions to replenish
     catalog = sorted(catalog, key=lambda x: x.quantity)
 
@@ -83,6 +82,7 @@ def get_bottle_plan():
     # randomize order of catalog
     random.shuffle(catalog)
 
+    # Make as many potions as possible
     while True:
         create_potion = False
         # make potions

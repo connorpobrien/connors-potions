@@ -38,7 +38,6 @@ class Result(BaseModel):
 # Gets called once a day
 @router.post("/results")
 def post_audit_results(audit_explanation: Result):
-    # -- ✅✅✅ -- #
     """ """
     print(f'''AUDIT: \n gold_match: {audit_explanation.gold_match} \n barrels_match: {audit_explanation.barrels_match} \n potions_match: {audit_explanation.potions_match}''')
     return "OK"
