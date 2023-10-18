@@ -56,8 +56,6 @@ def get_bottle_plan():
     """
     Go from barrel to bottle.
     """
-    bottle_plan = []
-
     with db.engine.begin() as connection:
         # query global
         sql_query = """SELECT num_red_ml, num_green_ml, num_blue_ml, num_dark_ml FROM global_inventory"""
@@ -72,15 +70,12 @@ def get_bottle_plan():
         
     # sort to find potions to replenish
     catalog = sorted(catalog, key=lambda x: x.quantity)
-
-    # if all potions already in stock
-    if all(item.quantity != 0 for item in catalog):
-        return []
-
     # disregard potions that have dark_ml for now
     catalog = [item for item in catalog if item.num_dark_ml == 0]
     # randomize order of catalog
     random.shuffle(catalog)
+
+    bottle_plan = {}
 
     # Make as many potions as possible
     while True:
@@ -92,7 +87,11 @@ def get_bottle_plan():
             if (inventory_red_ml >= red_ml) and (inventory_green_ml >= green_ml) and (inventory_blue_ml >= blue_ml) and (inventory_dark_ml >= dark_ml):
                 print(f"""inventory_red_ml: {inventory_red_ml} red_ml: {red_ml}, inventory_green_ml: {inventory_green_ml} green_ml: {green_ml}, inventory_blue_ml: {inventory_blue_ml} blue_ml: {blue_ml}, inventory_dark_ml: {inventory_dark_ml} dark_ml: {dark_ml}""")
                 # add to bottle plan
-                bottle_plan.append({"potion_type": [red_ml, green_ml, blue_ml, dark_ml], "quantity": 1})
+                potion_type = (red_ml, green_ml, blue_ml, dark_ml)
+                if potion_type in bottle_plan:
+                    bottle_plan[potion_type]["quantity"] += 1
+                else:
+                    bottle_plan[potion_type] = {"potion_type": potion_type, "quantity": 1}
 
                 create_potion = True
                 # update inventory
@@ -106,11 +105,11 @@ def get_bottle_plan():
             break
 
     # print bottle plan
-    for bottle in bottle_plan:
+    for bottle in bottle_plan.values():
         print(f'''potion_type: {bottle["potion_type"]} quantity: {bottle["quantity"]}''')
 
     # return bottle plan, max length 6
-    return bottle_plan[:6]
+    return list(bottle_plan.values())[:6]
 
     
 
