@@ -72,8 +72,6 @@ def get_bottle_plan():
     catalog = sorted(catalog, key=lambda x: x.quantity)
     # disregard potions that have dark_ml for now
     catalog = [item for item in catalog if item.num_dark_ml == 0]
-    # randomize order of catalog
-    random.shuffle(catalog)
 
     bottle_plan = {}
 
@@ -103,6 +101,8 @@ def get_bottle_plan():
                 break
         if not create_potion:
             break
+        # randomize order of catalog for next iteration
+        random.shuffle(catalog)
 
     # print bottle plan
     for bottle in bottle_plan.values():
