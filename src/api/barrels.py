@@ -91,19 +91,24 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     # sort whole sale primarily by catalog
     wholesale_catalog = sorted(wholesale_catalog, key=lambda x: x.price)
 
-    # buy as many potions as possible
+    # buy as many barrels as possible
     res = []
-    while (gold > min(barrel.price for barrel in wholesale_catalog if barrel.quantity > 0)) and any(barrel.quantity > 0 for barrel in wholesale_catalog):
+    while True:
+        barrel_purchased = False
         for barrel in wholesale_catalog:
             if barrel.price <= gold and barrel.quantity > 0:
                 res.append({
                     "sku": barrel.sku,
                     "quantity": 1,
                 })
+                barrel_purchased = True
                 # update tracking gold and barrels quanitity in catalog
                 gold -= barrel.price
                 barrel.quantity -= 1
                 print(f'''Barrel added to purchase plan: \n sku: {barrel.sku} \n ml_per_barrel: {barrel.ml_per_barrel} \n potion_type: {barrel.potion_type} \n price: {barrel.price} \n quantity: 1''')
+        if not barrel_purchased:
+            break
+
 
     return res
         

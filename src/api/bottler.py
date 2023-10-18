@@ -102,7 +102,7 @@ def get_bottle_plan():
                 inventory_dark_ml -= dark_ml
             if len(bottle_plan) == 6:
                 break
-        if create_potion == False:
+        if not create_potion:
             break
 
     # print bottle plan
