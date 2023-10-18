@@ -78,12 +78,14 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
         total_potions_bought = 0
 
         for item_sku, quantity in cart_items:
+            # TODO: Query catalog ledger JOIN catalog to find price
             # get price from catalog, add to total gold paid
             sql_query = """SELECT price FROM catalog WHERE sku = :item_sku"""
             result = connection.execute(sqlalchemy.text(sql_query), {"item_sku": item_sku})
             total_gold_paid += result.first().price * quantity
             total_potions_bought += quantity
 
+            # TODO: Update catalog ledger
             # decrease quantity in catalog table
             sql_query = """UPDATE catalog SET quantity = quantity - :quantity WHERE sku = :item_sku"""
             connection.execute(sqlalchemy.text(sql_query), {"quantity": quantity, "item_sku": item_sku})

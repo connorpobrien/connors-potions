@@ -28,6 +28,7 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
         red_ml, green_ml, blue_ml, dark_ml = potion.potion_type
         quantity = potion.quantity
 
+        # TODO: Update catalog ledger
         # update catalog
         with db.engine.begin() as connection:
             # insert values into catalog - conflict based on id 
@@ -39,6 +40,7 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
                            num_dark_ml = :dark_ml"""
             connection.execute(sqlalchemy.text(sql_query), {"quantity": quantity, "red_ml": red_ml, "green_ml": green_ml, "blue_ml": blue_ml, "dark_ml": dark_ml})
 
+        # TODO: Update inventory ledger
         # Update global_inventory
         with db.engine.begin() as connection:
             sql_query = f"""UPDATE global_inventory SET 
@@ -56,6 +58,7 @@ def get_bottle_plan():
     """
     Go from barrel to bottle.
     """
+    # TODO: Query inventory ledger to get gold and ml
     with db.engine.begin() as connection:
         # query global
         sql_query = """SELECT num_red_ml, num_green_ml, num_blue_ml, num_dark_ml FROM global_inventory"""
@@ -63,6 +66,7 @@ def get_bottle_plan():
         inventory_red_ml, inventory_green_ml, inventory_blue_ml, inventory_dark_ml = global_inventory
         print(f'''Inventory: red_ml: {inventory_red_ml} green_ml: {inventory_green_ml} blue_ml: {inventory_blue_ml} dark_ml: {inventory_dark_ml}''')
 
+    # TODO: Query catalog ledger to get potions
     with db.engine.begin() as connection:
         # query catalog
         sql_query = """SELECT sku, name, quantity, price, num_red_ml, num_green_ml, num_blue_ml, num_dark_ml FROM catalog"""

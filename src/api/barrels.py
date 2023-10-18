@@ -50,6 +50,7 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
         
     print(f"BARRELS DELIEVERD! \n gold_paid: {gold_paid} \n red_ml_received: {red_ml} \n green_ml_received: {green_ml} \n blue_ml_received: {blue_ml} \n dark_ml_received: {dark_ml}")
 
+    # TODO: Update inventory ledger
     # update global_inventory based on barrels that were delivered
     with db.engine.begin() as connection:
         sql_query = sqlalchemy.text("""UPDATE global_inventory SET 
@@ -80,6 +81,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
                         VALUES ('wholesale_catalog', :wholesale_catalog)"""
         connection.execute(sqlalchemy.text(sql_query), {"wholesale_catalog": wholesale_catalog_json})
 
+    # TODO: Query inventory ledger to determine values
     # get gold value from global_inventory
     with db.engine.begin() as connection:
         sql_query = """SELECT gold, num_red_ml, num_green_ml, num_blue_ml, num_dark_ml FROM global_inventory"""

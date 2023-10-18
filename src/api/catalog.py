@@ -9,6 +9,7 @@ def get_catalog():
     """
     Retrieves the catalog of items. Each unique item combination must have only a single price.
     """
+    # TODO: Query catalog ledger
     # query catalog
     with db.engine.begin() as connection:
         sql_query = """SELECT sku, name, quantity, price, num_red_ml, num_green_ml, num_blue_ml, num_dark_ml FROM catalog"""
