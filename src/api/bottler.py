@@ -86,11 +86,13 @@ def get_bottle_plan():
                 print(f"""inventory_red_ml: {inventory_red_ml} red_ml: {red_ml}, inventory_green_ml: {inventory_green_ml} green_ml: {green_ml}, inventory_blue_ml: {inventory_blue_ml} blue_ml: {blue_ml}, inventory_dark_ml: {inventory_dark_ml} dark_ml: {dark_ml}""")
                 # add to bottle plan
                 potion_type = (red_ml, green_ml, blue_ml, dark_ml)
+                if potion_type not in bottle_plan and len(bottle_plan) == 6:
+                    continue
                 if potion_type in bottle_plan:
                     bottle_plan[potion_type]["quantity"] += 1
                 else:
                     bottle_plan[potion_type] = {"potion_type": potion_type, "quantity": 1}
-
+                    
                 create_potion = True
                 # update inventory
                 inventory_red_ml -= red_ml
