@@ -88,62 +88,22 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
 
     print(f'''Current global inventory: \n gold: {gold} \n red_ml: {red_ml} \n green_ml: {green_ml} \n blue_ml: {blue_ml} \n dark_ml: {dark_ml}''')
 
-    # sort whole sale primarily by catalog ml_per_barrel, small to large
-    wholesale_catalog = sorted(wholesale_catalog, key=lambda x: x.ml_per_barrel)
+    # sort whole sale primarily by catalog
+    wholesale_catalog = sorted(wholesale_catalog, key=lambda x: x.price)
 
+    # buy as many potions as possible
     res = []
-    # if any of red, green, blue, or dark are less than 100 in global inventory, buy the smallest barrel of that type
-    if red_ml < 100:
+    while (gold > min(barrel.price for barrel in wholesale_catalog if barrel.quantity > 0)) and any(barrel.quantity > 0 for barrel in wholesale_catalog):
         for barrel in wholesale_catalog:
-            if barrel.potion_type == [1, 0, 0, 0]:
-                if gold >= barrel.price and barrel.quantity > 0:
-                    res.append({
-                        "sku": barrel.sku,
-                        "quantity": 1,
-                    })
-                    # spent gold
-                    gold -= barrel.price
-                    barrel.quantity -= 1
-                    print(f'''Barrel added to purchase plan: \n sku: {barrel.sku} \n ml_per_barrel: {barrel.ml_per_barrel} \n potion_type: {barrel.potion_type} \n price: {barrel.price} \n quantity: 1''')
-                    break
-    if green_ml < 100:
-        for barrel in wholesale_catalog:
-            if barrel.potion_type == [0, 1, 0, 0]:
-                if gold >= barrel.price and barrel.quantity > 0:
-                    res.append({
-                        "sku": barrel.sku,
-                        "quantity": 1,
-                    })
-                    # spent gold
-                    gold -= barrel.price
-                    barrel.quantity -= 1
-                    print(f'''Barrel added to purchase plan: \n sku: {barrel.sku} \n ml_per_barrel: {barrel.ml_per_barrel} \n potion_type: {barrel.potion_type} \n price: {barrel.price} \n quantity: 1''')
-                    break
-    if blue_ml < 100:
-        for barrel in wholesale_catalog:
-            if barrel.potion_type == [0, 0, 1, 0]:
-                if gold >= barrel.price:
-                    res.append({
-                        "sku": barrel.sku,
-                        "quantity": 1,
-                    })
-                    # spent gold
-                    gold -= barrel.price
-                    barrel.quantity -= 1
-                    print(f'''Barrel added to purchase plan: \n sku: {barrel.sku} \n ml_per_barrel: {barrel.ml_per_barrel} \n potion_type: {barrel.potion_type} \n price: {barrel.price} \n quantity: 1''')
-                    break
-
-    # iterate through rest of barrels and buy if possible
-    for barrel in wholesale_catalog:
-        if barrel.price <= gold and barrel.quantity > 0:
-            res.append({
-                "sku": barrel.sku,
-                "quantity": 1, # only buying one for now
-            })
-            # spent gold
-            gold -= barrel.price
-            barrel.quantity -= 1
-            print(f'''Barrel added to purchase plan: \n sku: {barrel.sku} \n ml_per_barrel: {barrel.ml_per_barrel} \n potion_type: {barrel.potion_type} \n price: {barrel.price} \n quantity: 1''')
+            if barrel.price <= gold and barrel.quantity > 0:
+                res.append({
+                    "sku": barrel.sku,
+                    "quantity": 1,
+                })
+                # update tracking gold and barrels quanitity in catalog
+                gold -= barrel.price
+                barrel.quantity -= 1
+                print(f'''Barrel added to purchase plan: \n sku: {barrel.sku} \n ml_per_barrel: {barrel.ml_per_barrel} \n potion_type: {barrel.potion_type} \n price: {barrel.price} \n quantity: 1''')
 
     return res
         
