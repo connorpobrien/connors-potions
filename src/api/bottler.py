@@ -21,33 +21,23 @@ class PotionInventory(BaseModel):
 def post_deliver_bottles(potions_delivered: list[PotionInventory]):
     """"""
     print("Bottles Delivered!")
-    for potion in potions_delivered:
-        print(f'''potion_type: {potion.potion_type} \n quantity: {potion.quantity}''')
-
-    # query catalog
-    with db.engine.begin() as connection:
-        sql_query = """SELECT id, sku, name, quantity, price, num_red_ml, num_green_ml, num_blue_ml, num_dark_ml FROM catalog"""
-        catalog = connection.execute(sqlalchemy.text(sql_query)).fetchall()
 
     # Based on how many potions were delivered, update the catalog and global_inventory
     for potion in potions_delivered:
+        print(f'''potion_type: {potion.potion_type} \n quantity: {potion.quantity}''')
         red_ml, green_ml, blue_ml, dark_ml = potion.potion_type
-        sku = name = f"{red_ml}_{green_ml}_{blue_ml}_{dark_ml}"
         quantity = potion.quantity
-
-        # determine id from catalog based on sku
-        for item in catalog:
-            if item.sku == sku:
-                id = item.id
-                break
 
         # update catalog
         with db.engine.begin() as connection:
             # insert values into catalog - conflict based on id 
-            sql_query = """INSERT INTO catalog (id, sku, name, price, quantity, num_red_ml, num_green_ml, num_blue_ml, num_dark_ml)
-                            VALUES (:id, :sku, :name, :quantity, :price, :red_ml, :green_ml, :blue_ml, :dark_ml) 
-                            ON CONFLICT (id) DO UPDATE SET quantity = catalog.quantity + :quantity"""
-            connection.execute(sqlalchemy.text(sql_query), {"id": id, "sku": sku, "name": name, "price": 100, "quantity": quantity, "red_ml": red_ml, "green_ml": green_ml, "blue_ml": blue_ml, "dark_ml": dark_ml})
+            sql_query = """UPDATE catalog SET quantity = quantity + :quantity
+                           WHERE 
+                           num_red_ml = :red_ml AND 
+                           num_green_ml = :green_ml AND 
+                           num_blue_ml = :blue_ml AND 
+                           num_dark_ml = :dark_ml"""
+            connection.execute(sqlalchemy.text(sql_query), {"quantity": quantity, "red_ml": red_ml, "green_ml": green_ml, "blue_ml": blue_ml, "dark_ml": dark_ml})
 
         # Update global_inventory
         with db.engine.begin() as connection:
@@ -128,11 +118,16 @@ def get_bottle_plan():
                 inventory_blue_ml -= blue_ml
                 inventory_dark_ml -= dark_ml
 
-    # make rest of potions
+    # disregard potions that have dark_ml for now
+    catalog = [item for item in catalog if item.num_dark_ml == 0]
+    # randomize order of catalog
+    random.shuffle(catalog)
+
+    # make potions
     for item in catalog:
         sku, name, quantity, price, red_ml, green_ml, blue_ml, dark_ml = item
         # if possible
-        if (inventory_red_ml >= red_ml) and (inventory_green_ml >= green_ml) and (inventory_blue_ml >= blue_ml) and (inventory_dark_ml >= dark_ml) and (quantity < 1):
+        if (inventory_red_ml >= red_ml) and (inventory_green_ml >= green_ml) and (inventory_blue_ml >= blue_ml) and (inventory_dark_ml >= dark_ml):
             print(f"""inventory_red_ml: {inventory_red_ml} red_ml: {red_ml}, inventory_green_ml: {inventory_green_ml} green_ml: {green_ml}, inventory_blue_ml: {inventory_blue_ml} blue_ml: {blue_ml}, inventory_dark_ml: {inventory_dark_ml} dark_ml: {dark_ml}""")
             # add to bottle plan
             bottle_plan.append({"potion_type": [red_ml, green_ml, blue_ml, dark_ml], "quantity": 1})
