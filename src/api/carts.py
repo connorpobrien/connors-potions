@@ -15,7 +15,6 @@ class NewCart(BaseModel):
 
 @router.post("/")
 def create_cart(new_cart: NewCart):
-    # -- ✅✅✅ -- #
     """ Creates a new cart for a specific customer. """
     with db.engine.begin() as connection:
         sql_query = """INSERT INTO carts (customer_name)
@@ -33,12 +32,6 @@ def create_cart(new_cart: NewCart):
 @router.get("/{cart_id}")
 def get_cart(cart_id: int):
     """ Returns the items in a customer's cart."""
-    # retrieve customer's cart based on the cart_id from cart_items table
-    # with db.engine.begin() as connection:
-    #     sql_query = """SELECT item_sku, quantity FROM cart_items WHERE cart_id = :cart_id"""
-    #     result = connection.execute(sqlalchemy.text(sql_query), {"cart_id": cart_id})
-    #     cart_items = result.fetchall()
-    # return cart_items
     return {}
 
     
@@ -48,7 +41,6 @@ class CartItem(BaseModel):
 
 @router.post("/{cart_id}/items/{item_sku}")
 def set_item_quantity(cart_id: int, item_sku: str, cart_item: CartItem):
-    # -- ✅✅✅ -- #
     """ Updates the quantity of a specific item in a cart. """
 
     with db.engine.begin() as connection:
@@ -75,7 +67,6 @@ class CartCheckout(BaseModel):
 
 @router.post("/{cart_id}/checkout")
 def checkout(cart_id: int, cart_checkout: CartCheckout):
-    # -- ✅✅✅ -- #
     """ Handles the checkout process for a specific cart. """
     # Get the items in the cart
     with db.engine.begin() as connection:
