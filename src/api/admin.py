@@ -54,15 +54,17 @@ def reset():
                             [0, 50, 50, 0],
                             [0, 50, 0, 50],
                             [0, 0, 50, 50]]
-        build_catalog = """INSERT INTO catalog (sku, name, quantity, price, num_red_ml, num_green_ml, num_blue_ml, num_dark_ml)
-                            VALUES (:sku, :name, :quantity, :price, :red_ml, :green_ml, :blue_ml, :dark_ml)
-                            RETURNING catalog_id"""
         for i in range(len(possible_potions)):
             red_ml, green_ml, blue_ml, dark_ml = possible_potions[i]
             sku = name = f"{red_ml}_{green_ml}_{blue_ml}_{dark_ml}"
             quantity = 0
-            price = 75
-            result = connection.execute(sqlalchemy.text(build_catalog), {"sku": sku, "name": name, "quantity": quantity, "price": price, "red_ml": red_ml, "green_ml": green_ml, "blue_ml": blue_ml, "dark_ml": dark_ml})
+            price = 50
+
+            # add to catalog table
+            build_catalog = """INSERT INTO catalog (sku, name, price, num_red_ml, num_green_ml, num_blue_ml, num_dark_ml)
+                            VALUES (:sku, :name, :quantity, :price, :red_ml, :green_ml, :blue_ml, :dark_ml)
+                            RETURNING catalog_id"""
+            result = connection.execute(sqlalchemy.text(build_catalog), {"sku": sku, "name": name, "price": price, "red_ml": red_ml, "green_ml": green_ml, "blue_ml": blue_ml, "dark_ml": dark_ml})
             catalog_id = result.fetchone()[0]
 
             # Process transaction
