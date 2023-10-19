@@ -16,31 +16,18 @@ def get_inventory():
     """"""
     # Get values from database
     with db.engine.begin() as connection:
-        # Use inventory ledger to get gold and ml 
-        # inventory_ledger_query = """SELECT type, SUM(change) AS total FROM inventory_ledger GROUP BY type"""
-        # inventory_ledger = connection.execute(sqlalchemy.text(inventory_ledger_query))
-        # inventory = {row.type: row.total for row in inventory_ledger}
-        # gold = inventory.get("gold", 0)
-        # num_red_ml = inventory.get("red_ml", 0)
-        # num_green_ml = inventory.get("green_ml", 0)
-        # num_blue_ml = inventory.get("blue_ml", 0)
-        # num_dark_ml = inventory.get("dark_ml", 0)
-        # print(f'''Inventory calculated from ledger: \n gold: {gold} \n num_red_ml: {num_red_ml} \n num_green_ml: {num_green_ml} \n num_blue_ml: {num_blue_ml} \n num_dark_ml: {num_dark_ml}''')
+        # Get gold, red_ml, green_ml, blue_ml, dark_ml from inventory_ledger
+        inventory_ledger_query = """SELECT SUM(change) AS total FROM inventory_ledger WHERE type = :type"""
+        gold = connection.execute(sqlalchemy.text(inventory_ledger_query), {"type": "gold"}).total
+        red_ml = connection.execute(sqlalchemy.text(inventory_ledger_query), {"type": "red_ml"}).total
+        green_ml = connection.execute(sqlalchemy.text(inventory_ledger_query), {"type": "green_ml"}).total
+        blue_ml = connection.execute(sqlalchemy.text(inventory_ledger_query), {"type": "blue_ml"}).total
+        dark_ml = connection.execute(sqlalchemy.text(inventory_ledger_query), {"type": "dark_ml"}).total
+        total_ml = red_ml + green_ml + blue_ml + dark_ml
 
-        # Use catalog ledger to find number of potions
-        # catalog_ledger_query = """SELECT SUM(change) AS total FROM catalog_ledger"""
-        # total_potions = connection.execute(sqlalchemy.text(catalog_ledger_query)).first().total
-        # print(f'''Total potions calculated from ledger: {total_potions}''')
-
-        # get data from global_inventory
-        sql_query = """SELECT gold, num_red_ml, num_green_ml, num_blue_ml, num_dark_ml FROM global_inventory"""
-        global_inventory = connection.execute(sqlalchemy.text(sql_query))
-        gold, num_red_ml, num_green_ml, num_blue_ml, num_dark_ml = global_inventory.first()
-        total_ml = num_red_ml + num_green_ml + num_blue_ml + num_dark_ml
-
-        # Get data from catalog
-        sql_query = """SELECT SUM(quantity) AS total_potions FROM catalog"""
-        total_potions = connection.execute(sqlalchemy.text(sql_query)).first().total_potions
+        # get total_potions from catalog_ledger
+        catalog_ledger_query = """SELECT SUM(change) AS total FROM catalog_ledger"""
+        total_potions = connection.execute(sqlalchemy.text(catalog_ledger_query)).total
 
     print(f'''CURRENT INVENTORY: \n number_of_potions: {total_potions} \n ml_in_barrels: {total_ml} \n gold: {gold}''')
     

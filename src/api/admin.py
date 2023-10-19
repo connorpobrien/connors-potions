@@ -19,32 +19,31 @@ def reset():
     carts and reset gold back to 100.
     """
     with db.engine.begin() as connection:
-        # Reset gold to 100. Set all ml to 0
-        reset_global_inventory = """UPDATE global_inventory SET gold = 100,
-                                                num_red_ml = 0,
-                                                num_blue_ml = 0,
-                                                num_green_ml = 0,
-                                                num_dark_ml = 0"""
-        connection.execute(sqlalchemy.text(reset_global_inventory))
-        print("Reset global inventory - Success")
+        # DELETE catalog, inventory_ledger, catalog_ledger, transactions, cart_items, carts
+        delete_catalog = """DELETE FROM catalog"""
+        connection.execute(sqlalchemy.text(delete_catalog))
+        delete_inventory_ledger = """DELETE FROM inventory_ledger"""
+        connection.execute(sqlalchemy.text(delete_inventory_ledger))
+        delete_catalog_ledger = """DELETE FROM catalog_ledger"""
+        connection.execute(sqlalchemy.text(delete_catalog_ledger))
+        delete_transactions = """DELETE FROM transactions"""
+        connection.execute(sqlalchemy.text(delete_transactions))
+        delete_cart_items = """DELETE FROM cart_items"""
+        connection.execute(sqlalchemy.text(delete_cart_items))
+        delete_carts = """DELETE FROM carts"""
+        connection.execute(sqlalchemy.text(delete_carts))
 
-        # Reset inventory_ledger
-        reset_inventory_ledger = """DELETE FROM inventory_ledger"""
-        connection.execute(sqlalchemy.text(reset_inventory_ledger))
+        print("Successfully deleted all tables")
 
-        # Reset catalog ledger
-        reset_catlog_ledger = """DELETE FROM catalog_ledger"""
-        connection.execture(sqlalchemy.text(reset_catlog_ledger))
+        # Process gold transaction - set to 100
+        gold_transaction = """INSERT INTO transactions (description) VALUES (:description) RETURNING transaction_id"""
+        result = connection.execute(sqlalchemy.text(gold_transaction), {"description": f"""Reset gold to 100"""})
+        transaction_id = result.fetchone()[0]
+        # add gold transaction to inventory_ledger
+        gold_inventory_ledger = """INSERT INTO inventory_ledger (type, change, transaction_id) VALUES (:type, :change, :transaction_id)"""
+        connection.execute(sqlalchemy.text(gold_inventory_ledger), {"type": "gold", "change": 100, "transaction_id": transaction_id})
 
-        # Reset transactions table
-        reset_transactions = """DELETE FROM transactions"""
-        connection.execute(sqlalchemy.text(reset_transactions))
-
-        # Clear catalog
-        reset_catalog = """DELETE FROM catalog"""
-        connection.execute(sqlalchemy.text(reset_catalog))
-
-        # Rebuild catalog (OLD)
+        # Rebuild catalog
         possible_potions = [[100, 0, 0, 0],
                             [0, 100, 0, 0],
                             [0, 0, 100, 0],
@@ -54,52 +53,35 @@ def reset():
                             [50, 0, 0, 50],
                             [0, 50, 50, 0],
                             [0, 50, 0, 50],
-                            [0, 0, 50, 50]] # I think more potion types will be added in future? Will adjust
+                            [0, 0, 50, 50]]
         build_catalog = """INSERT INTO catalog (sku, name, quantity, price, num_red_ml, num_green_ml, num_blue_ml, num_dark_ml)
-                            VALUES (:sku, :name, :quantity, :price, :red_ml, :green_ml, :blue_ml, :dark_ml)"""
+                            VALUES (:sku, :name, :quantity, :price, :red_ml, :green_ml, :blue_ml, :dark_ml)
+                            RETURNING catalog_id"""
         for i in range(len(possible_potions)):
             red_ml, green_ml, blue_ml, dark_ml = possible_potions[i]
             sku = name = f"{red_ml}_{green_ml}_{blue_ml}_{dark_ml}"
             quantity = 0
             price = 75
-            connection.execute(sqlalchemy.text(build_catalog), {"sku": sku, "name": name, "quantity": quantity, "price": price, "red_ml": red_ml, "green_ml": green_ml, "blue_ml": blue_ml, "dark_ml": dark_ml})
+            result = connection.execute(sqlalchemy.text(build_catalog), {"sku": sku, "name": name, "quantity": quantity, "price": price, "red_ml": red_ml, "green_ml": green_ml, "blue_ml": blue_ml, "dark_ml": dark_ml})
+            catalog_id = result.fetchone()[0]
 
-        # TODO: Rebuild catalog ledger by inserting all possible potions (NEW)
-        # for j in range(len(possible_potions)):
-        #     red_ml, green_ml, blue_ml, dark_ml = possible_potions[i]
-        #     sku = name = f"{red_ml}_{green_ml}_{blue_ml}_{dark_ml}"
-        #     quantity = 0
-        #     price = 48
-        #     # insert row into transactions table
-        #     build_transaction_catalog_query = """INSERT INTO transactions (description)
-        #                                         VALUES (:description)"""
-        #     connection.execute(sqlalchemy.text(build_transaction_catalog_query), {"description": f"Catalog: {sku} added with quantity {quantity}"})
+            # Process transaction
+            rebuild_potion_transaction = """INSERT INTO transactions (description) VALUES (:description) RETURNING transaction_id"""
+            result = connection.execute(sqlalchemy.text(rebuild_potion_transaction), {"description": f"""Catalog: {sku} added with quantity {quantity}"""})
+            transaction_id = result.fetchone()[0]
 
-        #     # insert row into catalog_ledger table - use transaction id generated from transaction table as foreign key
-        #     build_catalog_ledger_query = """INSERT INTO catalog_ledger (type, change, transaction_id)
-        #                                     VALUES (:type, :change, (SELECT MAX(transaction_id) FROM transactions))"""
-        #     connection.execute(sqlalchemy.text(build_catalog_ledger_query), {"type": sku, "change": quantity})
+            # Add transaction to catalog_ledger
+            rebuild_potion_catalog_ledger = """INSERT INTO catalog_ledger (transaction_id, catalog_id, change, sku) VALUES (:transaction_id, :catalog_id, :change, :sku)"""
+            connection.execute(sqlalchemy.text(rebuild_potion_catalog_ledger), {"transaction_id": transaction_id, "catalog_id": catalog_id, "change": quantity, "sku": sku})
 
-
-        print("Reset catalog - Success")
-
-        # Delete all carts and cart items
-        reset_carts_items = """DELETE FROM cart_items"""
-        connection.execute(sqlalchemy.text(reset_carts_items))
-
-        print("Reset cart items - Success")
-
-        reset_carts = """DELETE FROM carts"""
-        connection.execute(sqlalchemy.text(reset_carts))
-
-        print("Reset carts - Success")
+        print("Successfully rebuilt catalog")
 
     return "OK"
 
 
 @router.get("/shop_info/")
 def get_shop_info():
-    print("Get shop info - Success")
+    print("Successfully retrieved shop info")
     return {
         "shop_name": "connors-potions",
         "shop_owner": "Connor OBrien",
