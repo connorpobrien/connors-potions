@@ -61,8 +61,8 @@ def reset():
             price = 50
 
             # add to catalog table
-            build_catalog = """INSERT INTO catalog (sku, name, price, num_red_ml, num_green_ml, num_blue_ml, num_dark_ml)
-                            VALUES (:sku, :name, :quantity, :price, :red_ml, :green_ml, :blue_ml, :dark_ml)
+            build_catalog = """INSERT INTO catalog (sku, name, price, red_ml, green_ml, blue_ml, dark_ml)
+                            VALUES (:sku, :name, :price, :red_ml, :green_ml, :blue_ml, :dark_ml)
                             RETURNING catalog_id"""
             result = connection.execute(sqlalchemy.text(build_catalog), {"sku": sku, "name": name, "price": price, "red_ml": red_ml, "green_ml": green_ml, "blue_ml": blue_ml, "dark_ml": dark_ml})
             catalog_id = result.fetchone()[0]
