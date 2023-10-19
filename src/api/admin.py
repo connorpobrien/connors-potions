@@ -18,7 +18,6 @@ def reset():
     A call to reset shop will delete all inventory and in-flight 
     carts and reset gold back to 100.
     """
-    # TODO: Reset inventory ledger. Insert gold = 100 row to start
     with db.engine.begin() as connection:
         # Reset gold to 100. Set all ml to 0
         reset_global_inventory = """UPDATE global_inventory SET gold = 100,
@@ -29,7 +28,18 @@ def reset():
         connection.execute(sqlalchemy.text(reset_global_inventory))
         print("Reset global inventory - Success")
 
-        # TODO: Reset catalog ledger
+        # Reset inventory_ledger
+        reset_inventory_ledger = """DELETE FROM inventory_ledger"""
+        connection.execute(sqlalchemy.text(reset_inventory_ledger))
+
+        # Reset catalog ledger
+        reset_catlog_ledger = """DELETE FROM catalog_ledger"""
+        connection.execture(sqlalchemy.text(reset_catlog_ledger))
+
+        # Reset transactions table
+        reset_transactions = """DELETE FROM transactions"""
+        connection.execute(sqlalchemy.text(reset_transactions))
+
         # Clear catalog
         reset_catalog = """DELETE FROM catalog"""
         connection.execute(sqlalchemy.text(reset_catalog))

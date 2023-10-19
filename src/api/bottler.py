@@ -28,7 +28,26 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
         red_ml, green_ml, blue_ml, dark_ml = potion.potion_type
         quantity = potion.quantity
 
-        # TODO: Update catalog ledger
+        # add transaction to transactions table
+        with db.engine.begin() as connection:
+            # insert into transactions table - discription should note the potion type and quantity
+            sql_query = """INSERT INTO transactions (description) VALUES (:description)"""
+            connection.execute(sqlalchemy.text(sql_query), {"description": f"""Delivered {quantity} of potion type {potion.potion_type}"""})
+
+        # insert a row into inventory ledger for each color of ml delivered
+        # use primary key 'transaction_id' created from transaction table as foreign key
+        with db.engine.begin() as connection:
+            # insert into inventory ledger - type should be red_ml, green_ml, blue_ml, or dark_ml
+            sql_query = """INSERT INTO inventory_ledger (type, change, transaction_id)
+                            VALUES (:type, :change, (SELECT MAX(transaction_id) FROM transactions))"""
+            connection.execute(sqlalchemy.text(sql_query), {"type": "red_ml", "change": red_ml * quantity})
+            connection.execute(sqlalchemy.text(sql_query), {"type": "green_ml", "change": green_ml * quantity})
+            connection.execute(sqlalchemy.text(sql_query), {"type": "blue_ml", "change": blue_ml * quantity})
+            connection.execute(sqlalchemy.text(sql_query), {"type": "dark_ml", "change": dark_ml * quantity})
+
+        # TODO: insert a row into catalog ledger
+        # Use potion type to find id from catalog table
+
         # update catalog
         with db.engine.begin() as connection:
             # insert values into catalog - conflict based on id 
@@ -40,7 +59,6 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
                            num_dark_ml = :dark_ml"""
             connection.execute(sqlalchemy.text(sql_query), {"quantity": quantity, "red_ml": red_ml, "green_ml": green_ml, "blue_ml": blue_ml, "dark_ml": dark_ml})
 
-        # TODO: Update inventory ledger
         # Update global_inventory
         with db.engine.begin() as connection:
             sql_query = f"""UPDATE global_inventory SET 
@@ -58,7 +76,6 @@ def get_bottle_plan():
     """
     Go from barrel to bottle.
     """
-    # TODO: Query inventory ledger to get gold and ml
     with db.engine.begin() as connection:
         # query global
         sql_query = """SELECT num_red_ml, num_green_ml, num_blue_ml, num_dark_ml FROM global_inventory"""
@@ -66,7 +83,6 @@ def get_bottle_plan():
         inventory_red_ml, inventory_green_ml, inventory_blue_ml, inventory_dark_ml = global_inventory
         print(f'''Inventory: red_ml: {inventory_red_ml} green_ml: {inventory_green_ml} blue_ml: {inventory_blue_ml} dark_ml: {inventory_dark_ml}''')
 
-    # TODO: Query catalog ledger to get potions
     with db.engine.begin() as connection:
         # query catalog
         sql_query = """SELECT sku, name, quantity, price, num_red_ml, num_green_ml, num_blue_ml, num_dark_ml FROM catalog"""
@@ -116,6 +132,3 @@ def get_bottle_plan():
 
     # return bottle plan, max length 6
     return list(bottle_plan.values())[:6]
-
-    
-
