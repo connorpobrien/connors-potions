@@ -42,90 +42,103 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
                 red_ml += barrel_delivered.ml_per_barrel * barrel_delivered.quantity
                 # add gold transaction to transaction table
                 sql_query = sqlalchemy.text("""INSERT INTO transactions (description)
-                                                VALUES (:description)""")
-                connection.execute(sql_query, {"description": f"Gold spend on {barrel_delivered.sku}: {barrel_delivered.price * barrel_delivered.quantity}"})
+                                                VALUES (:description)
+                                                RETURNING transaction_id""")
+                result = connection.execute(sql_query, {"description": f"Gold spend on {barrel_delivered.sku}: {barrel_delivered.price * barrel_delivered.quantity}"})
+                transaction_id = result.fetchone()[0]
 
                 # add gold transaction to inventory ledger - use primary key 'transaction_id' created from transaction table as foreign key
                 sql_query = sqlalchemy.text("""INSERT INTO inventory_ledger (type, change, transaction_id)
-                                                VALUES ('gold', :gold_paid, (SELECT MAX(transaction_id) FROM transactions))""")
-                connection.execute(sql_query, {"gold_paid": barrel_delivered.price * barrel_delivered.quantity})
+                                                VALUES ('gold', :gold_paid, :transaction_id)""")
+                connection.execute(sql_query, {"gold_paid": barrel_delivered.price * barrel_delivered.quantity, "transaction_id": transaction_id})
+
 
                 # add red_ml transaction to transaction table
                 sql_query = sqlalchemy.text("""INSERT INTO transactions (description)
-                                                VALUES (:description)""")
-                connection.execute(sql_query, {"description": f"Red ml delivered: {barrel_delivered.ml_per_barrel * barrel_delivered.quantity}"})
+                                                VALUES (:description)
+                                                RETURNING transaction_id""")
+                result = connection.execute(sql_query, {"description": f"Red ml delivered: {barrel_delivered.ml_per_barrel * barrel_delivered.quantity}"})
+                transaction_id = result.fetchone()[0]
 
                 # add red_ml transaction to inventory ledger - use primary key 'transaction_id' created from transaction table as foreign key
                 sql_query = sqlalchemy.text("""INSERT INTO inventory_ledger (type, change, transaction_id)
-                                                VALUES ('red_ml', :red_ml, (SELECT MAX(transaction_id) FROM transactions))""")
-                connection.execute(sql_query, {"red_ml": barrel_delivered.ml_per_barrel * barrel_delivered.quantity})
-
+                                                VALUES ('red_ml', :red_ml, :transaction_id)""")
+                connection.execute(sql_query, {"red_ml": barrel_delivered.ml_per_barrel * barrel_delivered.quantity, "transaction_id": transaction_id})
             elif barrel_delivered.potion_type == [0, 1, 0, 0]: # Green barrel
                 green_ml += barrel_delivered.ml_per_barrel * barrel_delivered.quantity
                 # add gold transaction to transaction table
                 sql_query = sqlalchemy.text("""INSERT INTO transactions (description)
-                                                VALUES (:description)""")
-                connection.execute(sql_query, {"description": f"Gold spend on {barrel_delivered.sku}: {barrel_delivered.price * barrel_delivered.quantity}"})
+                                                VALUES (:description)
+                                                RETURNING transaction_id""")
+                result = connection.execute(sql_query, {"description": f"Gold spend on {barrel_delivered.sku}: {barrel_delivered.price * barrel_delivered.quantity}"})
+                transaction_id = result.fetchone()[0]
 
                 # add gold transaction to inventory ledger - use primary key 'transaction_id' created from transaction table as foreign key
                 sql_query = sqlalchemy.text("""INSERT INTO inventory_ledger (type, change, transaction_id)
-                                                VALUES ('gold', :gold_paid, (SELECT MAX(transaction_id) FROM transactions))""")
-                connection.execute(sql_query, {"gold_paid": barrel_delivered.price * barrel_delivered.quantity})
+                                                VALUES ('gold', :gold_paid, :transaction_id)""")
+                connection.execute(sql_query, {"gold_paid": barrel_delivered.price * barrel_delivered.quantity, "transaction_id": transaction_id})
 
                 # add green_ml transaction to transaction table
                 sql_query = sqlalchemy.text("""INSERT INTO transactions (description)
-                                                VALUES (:description)""")
-                connection.execute(sql_query, {"description": f"Green ml delivered: {barrel_delivered.ml_per_barrel * barrel_delivered.quantity}"})
+                                                VALUES (:description)
+                                                RETURNING transaction_id""")
+                result = connection.execute(sql_query, {"description": f"Green ml delivered: {barrel_delivered.ml_per_barrel * barrel_delivered.quantity}"})
+                transaction_id = result.fetchone()[0]
 
                 # add green_ml transaction to inventory ledger - use primary key 'transaction_id' created from transaction table as foreign key
                 sql_query = sqlalchemy.text("""INSERT INTO inventory_ledger (type, change, transaction_id)
-                                                VALUES ('green_ml', :green_ml, (SELECT MAX(transaction_id) FROM transactions))""")
-                connection.execute(sql_query, {"green_ml": barrel_delivered.ml_per_barrel * barrel_delivered.quantity})
-
+                                                VALUES ('green_ml', :green_ml, :transaction_id)""")
+                connection.execute(sql_query, {"green_ml": barrel_delivered.ml_per_barrel * barrel_delivered.quantity, "transaction_id": transaction_id})
             elif barrel_delivered.potion_type == [0, 0, 1, 0]: # Blue barrel
                 blue_ml += barrel_delivered.ml_per_barrel * barrel_delivered.quantity
                 # add gold transaction to transaction table
                 sql_query = sqlalchemy.text("""INSERT INTO transactions (description)
-                                                VALUES (:description)""")
-                connection.execute(sql_query, {"description": f"Gold spend on {barrel_delivered.sku}: {barrel_delivered.price * barrel_delivered.quantity}"})
+                                                VALUES (:description)
+                                                RETURNING transaction_id""")
+                result = connection.execute(sql_query, {"description": f"Gold spend on {barrel_delivered.sku}: {barrel_delivered.price * barrel_delivered.quantity}"})
+                transaction_id = result.fetchone()[0]
 
                 # add gold transaction to inventory ledger - use primary key 'transaction_id' created from transaction table as foreign key
                 sql_query = sqlalchemy.text("""INSERT INTO inventory_ledger (type, change, transaction_id)
-                                                VALUES ('gold', :gold_paid, (SELECT MAX(transaction_id) FROM transactions))""")
-                connection.execute(sql_query, {"gold_paid": barrel_delivered.price * barrel_delivered.quantity})
+                                                VALUES ('gold', :gold_paid, :transaction_id)""")
+                connection.execute(sql_query, {"gold_paid": barrel_delivered.price * barrel_delivered.quantity, "transaction_id": transaction_id})
 
                 # add blue_ml transaction to transaction table
                 sql_query = sqlalchemy.text("""INSERT INTO transactions (description)
-                                                VALUES (:description)""")
-                connection.execute(sql_query, {"description": f"Blue ml delivered: {barrel_delivered.ml_per_barrel * barrel_delivered.quantity}"})
+                                                VALUES (:description)
+                                                RETURNING transaction_id""")
+                result = connection.execute(sql_query, {"description": f"Blue ml delivered: {barrel_delivered.ml_per_barrel * barrel_delivered.quantity}"})
+                transaction_id = result.fetchone()[0]
 
-                # add blue_ml transaction to inventory ledger 
+                # add blue_ml transaction to inventory ledger - use primary key 'transaction_id' created from transaction table as foreign key
                 sql_query = sqlalchemy.text("""INSERT INTO inventory_ledger (type, change, transaction_id)
-                                                VALUES ('blue_ml', :blue_ml, (SELECT MAX(transaction_id) FROM transactions))""")
-                connection.execute(sql_query, {"blue_ml": barrel_delivered.ml_per_barrel * barrel_delivered.quantity})
-
+                                                VALUES ('blue_ml', :blue_ml, :transaction_id)""")
+                connection.execute(sql_query, {"blue_ml": barrel_delivered.ml_per_barrel * barrel_delivered.quantity, "transaction_id": transaction_id})
             elif barrel_delivered.potion_type == [0, 0, 0, 1]: # Dark barrel
                 dark_ml += barrel_delivered.ml_per_barrel * barrel_delivered.quantity
                 # add gold transaction to transaction table
                 sql_query = sqlalchemy.text("""INSERT INTO transactions (description)
-                                                VALUES (:description)""")
-                connection.execute(sql_query, {"description": f"Gold spend on {barrel_delivered.sku}: {barrel_delivered.price * barrel_delivered.quantity}"})
+                                                VALUES (:description)
+                                                RETURNING transaction_id""")
+                result = connection.execute(sql_query, {"description": f"Gold spend on {barrel_delivered.sku}: {barrel_delivered.price * barrel_delivered.quantity}"})
+                transaction_id = result.fetchone()[0]
 
-                # add gold transaction to inventory ledger 
+                # add gold transaction to inventory ledger - use primary key 'transaction_id' created from transaction table as foreign key
                 sql_query = sqlalchemy.text("""INSERT INTO inventory_ledger (type, change, transaction_id)
-                                                VALUES ('gold', :gold_paid, (SELECT MAX(transaction_id) FROM transactions))""")
-                connection.execute(sql_query, {"gold_paid": barrel_delivered.price * barrel_delivered.quantity})
+                                                VALUES ('gold', :gold_paid, :transaction_id)""")
+                connection.execute(sql_query, {"gold_paid": barrel_delivered.price * barrel_delivered.quantity, "transaction_id": transaction_id})
 
                 # add dark_ml transaction to transaction table
                 sql_query = sqlalchemy.text("""INSERT INTO transactions (description)
-                                                VALUES (:description)""")
-                connection.execute(sql_query, {"description": f"Dark ml delivered: {barrel_delivered.ml_per_barrel * barrel_delivered.quantity}"})
+                                                VALUES (:description)
+                                                RETURNING transaction_id""")
+                result = connection.execute(sql_query, {"description": f"Dark ml delivered: {barrel_delivered.ml_per_barrel * barrel_delivered.quantity}"})
+                transaction_id = result.fetchone()[0]
 
-                # add dark_ml transaction to inventory ledger 
+                # add dark_ml transaction to inventory ledger - use primary key 'transaction_id' created from transaction table as foreign key
                 sql_query = sqlalchemy.text("""INSERT INTO inventory_ledger (type, change, transaction_id)
-                                                VALUES ('dark_ml', :dark_ml, (SELECT MAX(transaction_id) FROM transactions))""")
-                connection.execute(sql_query, {"dark_ml": barrel_delivered.ml_per_barrel * barrel_delivered.quantity})
-                
+                                                VALUES ('dark_ml', :dark_ml, :transaction_id)""")
+                connection.execute(sql_query, {"dark_ml": barrel_delivered.ml_per_barrel * barrel_delivered.quantity, "transaction_id": transaction_id})
             else:
                 raise Exception("Invalid potion type")
         

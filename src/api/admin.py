@@ -44,8 +44,7 @@ def reset():
         reset_catalog = """DELETE FROM catalog"""
         connection.execute(sqlalchemy.text(reset_catalog))
 
-        # TODO: Rebuild catalog ledger by inserting all possible potions
-        # Rebuild catalog
+        # Rebuild catalog (OLD)
         possible_potions = [[100, 0, 0, 0],
                             [0, 100, 0, 0],
                             [0, 0, 100, 0],
@@ -64,6 +63,23 @@ def reset():
             quantity = 0
             price = 75
             connection.execute(sqlalchemy.text(build_catalog), {"sku": sku, "name": name, "quantity": quantity, "price": price, "red_ml": red_ml, "green_ml": green_ml, "blue_ml": blue_ml, "dark_ml": dark_ml})
+
+        # TODO: Rebuild catalog ledger by inserting all possible potions (NEW)
+        # for j in range(len(possible_potions)):
+        #     red_ml, green_ml, blue_ml, dark_ml = possible_potions[i]
+        #     sku = name = f"{red_ml}_{green_ml}_{blue_ml}_{dark_ml}"
+        #     quantity = 0
+        #     price = 48
+        #     # insert row into transactions table
+        #     build_transaction_catalog_query = """INSERT INTO transactions (description)
+        #                                         VALUES (:description)"""
+        #     connection.execute(sqlalchemy.text(build_transaction_catalog_query), {"description": f"Catalog: {sku} added with quantity {quantity}"})
+
+        #     # insert row into catalog_ledger table - use transaction id generated from transaction table as foreign key
+        #     build_catalog_ledger_query = """INSERT INTO catalog_ledger (type, change, transaction_id)
+        #                                     VALUES (:type, :change, (SELECT MAX(transaction_id) FROM transactions))"""
+        #     connection.execute(sqlalchemy.text(build_catalog_ledger_query), {"type": sku, "change": quantity})
+
 
         print("Reset catalog - Success")
 
