@@ -78,15 +78,34 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
         total_potions_bought = 0
 
         for item_sku, quantity in cart_items:
-            # TODO: Query catalog ledger JOIN catalog to find price
             # get price from catalog, add to total gold paid
             sql_query = """SELECT price FROM catalog WHERE sku = :item_sku"""
             result = connection.execute(sqlalchemy.text(sql_query), {"item_sku": item_sku})
             total_gold_paid += result.first().price * quantity
             total_potions_bought += quantity
 
-            # TODO: Update catalog ledger
-            # decrease quantity in catalog table
+            # NEW - Insert row into transaction table
+            sql_query = """INSERT INTO transactions (description)
+                            VALUES (:description) RETURNING transaction_id"""
+            result = connection.execute(sqlalchemy.text(sql_query), {"description": f"checkout for {item_sku} with quantity {quantity}"})
+            transaction_id = result.fetchone()[0]
+
+            # NEW - get item price from catalog
+            sql_query = """SELECT price FROM catalog WHERE sku = :item_sku"""
+            result = connection.execute(sqlalchemy.text(sql_query), {"item_sku": item_sku})
+            item_price_new = result.first().price
+
+            # NEW - insert row into catalog ledger for potion decrease
+            sql_query = """INSERT INTO catalog_ledger (transaction_id, catalog_id, change, sku, price)
+                            VALUES (:transaction_id, :catalog_id, :change, :sku, :price)"""
+            connection.execute(sqlalchemy.text(sql_query), {"transaction_id": transaction_id, "catalog_id": item_sku, "change": -quantity, "sku": item_sku, "price": item_price_new})
+
+            # NEW - insert row into inventory ledger for gold increase
+            sql_query = """INSERT INTO inventory_ledger (type, change, transaction_id)
+                            VALUES (:type, :change, :transaction_id)"""
+            connection.execute(sqlalchemy.text(sql_query), {"type": "gold", "change": item_price_new * quantity, "transaction_id": transaction_id})
+
+            # NEW - decrease quantity in catalog table
             sql_query = """UPDATE catalog SET quantity = quantity - :quantity WHERE sku = :item_sku"""
             connection.execute(sqlalchemy.text(sql_query), {"quantity": quantity, "item_sku": item_sku})
 

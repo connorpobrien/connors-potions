@@ -31,22 +31,33 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
         # add transaction to transactions table
         with db.engine.begin() as connection:
             # insert into transactions table - discription should note the potion type and quantity
-            sql_query = """INSERT INTO transactions (description) VALUES (:description)"""
-            connection.execute(sqlalchemy.text(sql_query), {"description": f"""Delivered {quantity} of potion type {potion.potion_type}"""})
+            sql_query = """INSERT INTO transactions (description) VALUES (:description) RETURNING transaction_id"""
+            result = connection.execute(sqlalchemy.text(sql_query), {"description": f"""Delivered {quantity} of potion type {potion.potion_type}"""})
+            transaction_id = result.fetchone()[0]
 
         # insert a row into inventory ledger for each color of ml delivered
         # use primary key 'transaction_id' created from transaction table as foreign key
         with db.engine.begin() as connection:
             # insert into inventory ledger - type should be red_ml, green_ml, blue_ml, or dark_ml
             sql_query = """INSERT INTO inventory_ledger (type, change, transaction_id)
-                            VALUES (:type, :change, (SELECT MAX(transaction_id) FROM transactions))"""
-            connection.execute(sqlalchemy.text(sql_query), {"type": "red_ml", "change": red_ml * quantity})
-            connection.execute(sqlalchemy.text(sql_query), {"type": "green_ml", "change": green_ml * quantity})
-            connection.execute(sqlalchemy.text(sql_query), {"type": "blue_ml", "change": blue_ml * quantity})
-            connection.execute(sqlalchemy.text(sql_query), {"type": "dark_ml", "change": dark_ml * quantity})
+                            VALUES (:type, :change, :transaction_id)"""
+            connection.execute(sqlalchemy.text(sql_query), {"type": "red_ml", "change": red_ml * quantity, "transaction_id": transaction_id})
+            connection.execute(sqlalchemy.text(sql_query), {"type": "green_ml", "change": green_ml * quantity, "transaction_id": transaction_id})
+            connection.execute(sqlalchemy.text(sql_query), {"type": "blue_ml", "change": blue_ml * quantity, "transaction_id": transaction_id})
+            connection.execute(sqlalchemy.text(sql_query), {"type": "dark_ml", "change": dark_ml * quantity, "transaction_id": transaction_id})
 
         # TODO: insert a row into catalog ledger
         # Use potion type to find id from catalog table
+        with db.engine.begin() as connection:
+            # determine catalog_id of potion type 
+            sql_query = """SELECT id, sku FROM catalog WHERE num_red_ml = :red_ml AND num_green_ml = :green_ml AND num_blue_ml = :blue_ml AND num_dark_ml = :dark_ml"""
+            result = connection.execute(sqlalchemy.text(sql_query), {"red_ml": red_ml, "green_ml": green_ml, "blue_ml": blue_ml, "dark_ml": dark_ml})
+            catalog_id, sku = result.fetchone()
+
+            # insert into catalog ledger - transaction id points to transaction table, catalog_id points to catalog table. other columns = potions_sku, change
+            sql_query = """INSERT INTO catalog_ledger (transaction_id, catalog_id, change, sku)
+                            VALUES (:transaction_id, :catalog_id, :change, :sku)"""
+            connection.execute(sqlalchemy.text(sql_query), {"transaction_id": transaction_id, "catalog_id": catalog_id, "change": quantity, "sku": sku})  
 
         # update catalog
         with db.engine.begin() as connection:
