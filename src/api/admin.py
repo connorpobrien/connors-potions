@@ -19,20 +19,20 @@ def reset():
     carts and reset gold back to 100.
     """
     with db.engine.begin() as connection:
-        # DELETE catalog, inventory_ledger, catalog_ledger, transactions, cart_items, carts
-        delete_catalog = """DELETE FROM catalog"""
-        connection.execute(sqlalchemy.text(delete_catalog))
-        delete_inventory_ledger = """DELETE FROM inventory_ledger"""
-        connection.execute(sqlalchemy.text(delete_inventory_ledger))
-        delete_catalog_ledger = """DELETE FROM catalog_ledger"""
-        connection.execute(sqlalchemy.text(delete_catalog_ledger))
-        delete_transactions = """DELETE FROM transactions"""
-        connection.execute(sqlalchemy.text(delete_transactions))
+        # DELETE cart_items, carts, catalog, catalog_ledger, inventory_ledger, transactions
         delete_cart_items = """DELETE FROM cart_items"""
         connection.execute(sqlalchemy.text(delete_cart_items))
         delete_carts = """DELETE FROM carts"""
         connection.execute(sqlalchemy.text(delete_carts))
-
+        delete_catalog = """DELETE FROM catalog"""
+        connection.execute(sqlalchemy.text(delete_catalog))
+        delete_catalog_ledger = """DELETE FROM catalog_ledger"""
+        connection.execute(sqlalchemy.text(delete_catalog_ledger))
+        delete_inventory_ledger = """DELETE FROM inventory_ledger"""
+        connection.execute(sqlalchemy.text(delete_inventory_ledger))
+        delete_transactions = """DELETE FROM transactions"""
+        connection.execute(sqlalchemy.text(delete_transactions))
+    
         print("Successfully deleted all tables")
 
         # Process gold transaction - set to 100
