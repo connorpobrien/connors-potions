@@ -18,11 +18,11 @@ def get_inventory():
     with db.engine.begin() as connection:
         # Get gold, red_ml, green_ml, blue_ml, dark_ml from inventory_ledger
         inventory_ledger_query = """SELECT SUM(change) AS total FROM inventory_ledger WHERE type = :type"""
-        gold = connection.execute(sqlalchemy.text(inventory_ledger_query), {"type": "gold"}).total
-        red_ml = connection.execute(sqlalchemy.text(inventory_ledger_query), {"type": "red_ml"}).total
-        green_ml = connection.execute(sqlalchemy.text(inventory_ledger_query), {"type": "green_ml"}).total
-        blue_ml = connection.execute(sqlalchemy.text(inventory_ledger_query), {"type": "blue_ml"}).total
-        dark_ml = connection.execute(sqlalchemy.text(inventory_ledger_query), {"type": "dark_ml"}).total
+        gold = connection.execute(sqlalchemy.text(inventory_ledger_query), {"type": "gold"}).first()[0] or 0
+        red_ml = connection.execute(sqlalchemy.text(inventory_ledger_query), {"type": "red_ml"}).first()[0] or 0
+        green_ml = connection.execute(sqlalchemy.text(inventory_ledger_query), {"type": "green_ml"}).first()[0] or 0
+        blue_ml = connection.execute(sqlalchemy.text(inventory_ledger_query), {"type": "blue_ml"}).first()[0] or 0
+        dark_ml = connection.execute(sqlalchemy.text(inventory_ledger_query), {"type": "dark_ml"}).first()[0] or 0
         total_ml = red_ml + green_ml + blue_ml + dark_ml
 
         # get total_potions from catalog_ledger

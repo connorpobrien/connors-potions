@@ -24,15 +24,17 @@ def reset():
         connection.execute(sqlalchemy.text(delete_cart_items))
         delete_carts = """DELETE FROM carts"""
         connection.execute(sqlalchemy.text(delete_carts))
-        delete_catalog = """DELETE FROM catalog"""
-        connection.execute(sqlalchemy.text(delete_catalog))
         delete_catalog_ledger = """DELETE FROM catalog_ledger"""
         connection.execute(sqlalchemy.text(delete_catalog_ledger))
         delete_inventory_ledger = """DELETE FROM inventory_ledger"""
         connection.execute(sqlalchemy.text(delete_inventory_ledger))
         delete_transactions = """DELETE FROM transactions"""
         connection.execute(sqlalchemy.text(delete_transactions))
-    
+        delete_catalog = """DELETE FROM catalog"""
+        connection.execute(sqlalchemy.text(delete_catalog))
+
+
+
         print("Successfully deleted all tables")
 
         # Process gold transaction - set to 100
