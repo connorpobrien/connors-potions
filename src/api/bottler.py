@@ -42,7 +42,7 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
             connection.execute(sqlalchemy.text(inventory_ledger), {"type": "dark_ml", "change": dark_ml * quantity, "transaction_id": transaction_id})
 
             # find catalog_id, sku from catalog table
-            catalog_id_query = """SELECT catalog_id, sku FROM catalog WHERE num_red_ml = :red_ml AND num_green_ml = :green_ml AND num_blue_ml = :blue_ml AND num_dark_ml = :dark_ml"""
+            catalog_id_query = """SELECT catalog_id, sku FROM catalog WHERE red_ml = :red_ml AND green_ml = :green_ml AND blue_ml = :blue_ml AND dark_ml = :dark_ml"""
             result = connection.execute(sqlalchemy.text(catalog_id_query), {"red_ml": red_ml, "green_ml": green_ml, "blue_ml": blue_ml, "dark_ml": dark_ml})
             catalog_id, sku = result.fetchone()
 
@@ -96,7 +96,7 @@ def get_bottle_plan():
     # sort to find potions to replenish
     catalog = sorted(catalog, key=lambda x: x.quantity)
     # disregard potions that have dark_ml for now
-    catalog = [item for item in catalog if item.num_dark_ml == 0]
+    catalog = [item for item in catalog if item.dark_ml == 0]
 
     bottle_plan = {}
 
