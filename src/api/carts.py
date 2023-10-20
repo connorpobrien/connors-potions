@@ -117,7 +117,7 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
 
             # add gold transaction to inventory_ledger
             gold_inventory_ledger = """INSERT INTO inventory_ledger (type, change, transaction_id) VALUES (:type, :change, :transaction_id)"""
-            connection.execute(sqlalchemy.text(gold_inventory_ledger), {"type": "gold", "change": (-1) * price * quantity, "transaction_id": transaction_id})
+            connection.execute(sqlalchemy.text(gold_inventory_ledger), {"type": "gold", "change": price * quantity, "transaction_id": transaction_id})
 
             # add potion transaction to transactions table
             potion_transaction = """INSERT INTO transactions (description) VALUES (:description) RETURNING transaction_id"""
