@@ -27,7 +27,7 @@ def get_inventory():
 
         # get total_potions from catalog_ledger
         catalog_ledger_query = """SELECT SUM(change) AS total FROM catalog_ledger"""
-        total_potions = connection.execute(sqlalchemy.text(catalog_ledger_query)).total
+        total_potions = connection.execute(sqlalchemy.text(catalog_ledger_query)).first()[0] or 0
 
     print(f'''CURRENT INVENTORY: \n number_of_potions: {total_potions} \n ml_in_barrels: {total_ml} \n gold: {gold}''')
     
