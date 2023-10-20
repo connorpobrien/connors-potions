@@ -36,10 +36,10 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
 
             # for each type of ml, add a row to inventory_ledger
             inventory_ledger = """INSERT INTO inventory_ledger (type, change, transaction_id) VALUES (:type, :change, :transaction_id)"""
-            connection.execute(sqlalchemy.text(inventory_ledger), {"type": "red_ml", "change": red_ml * quantity, "transaction_id": transaction_id})
-            connection.execute(sqlalchemy.text(inventory_ledger), {"type": "green_ml", "change": green_ml * quantity, "transaction_id": transaction_id})
-            connection.execute(sqlalchemy.text(inventory_ledger), {"type": "blue_ml", "change": blue_ml * quantity, "transaction_id": transaction_id})
-            connection.execute(sqlalchemy.text(inventory_ledger), {"type": "dark_ml", "change": dark_ml * quantity, "transaction_id": transaction_id})
+            connection.execute(sqlalchemy.text(inventory_ledger), {"type": "red_ml", "change": (-1) * red_ml * quantity, "transaction_id": transaction_id})
+            connection.execute(sqlalchemy.text(inventory_ledger), {"type": "green_ml", "change": (-1) * green_ml * quantity, "transaction_id": transaction_id})
+            connection.execute(sqlalchemy.text(inventory_ledger), {"type": "blue_ml", "change": (-1) * blue_ml * quantity, "transaction_id": transaction_id})
+            connection.execute(sqlalchemy.text(inventory_ledger), {"type": "dark_ml", "change": (-1) * dark_ml * quantity, "transaction_id": transaction_id})
 
             # find catalog_id, sku from catalog table
             catalog_id_query = """SELECT catalog_id, sku FROM catalog WHERE red_ml = :red_ml AND green_ml = :green_ml AND blue_ml = :blue_ml AND dark_ml = :dark_ml"""

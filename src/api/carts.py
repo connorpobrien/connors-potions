@@ -123,9 +123,14 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
             potion_transaction = """INSERT INTO transactions (description) VALUES (:description) RETURNING transaction_id"""
             result = connection.execute(sqlalchemy.text(potion_transaction), {"description": f"""{quantity} of potion type {item_sku} sold."""})
 
+            # find catalog_id, sku from catalog table
+            catalog_id_query = """SELECT catalog_id FROM catalog WHERE sku = :sku"""
+            result = connection.execute(sqlalchemy.text(catalog_id_query), {"sku": item_sku})
+            catalog_id = result.fetchone()[0]
+
             # add potion transaction to catalog_ledger
             catalog_ledger = """INSERT INTO catalog_ledger (transaction_id, catalog_id, change, sku) VALUES (:transaction_id, :catalog_id, :change, :sku)"""
-            connection.execute(sqlalchemy.text(catalog_ledger), {"transaction_id": transaction_id, "catalog_id": item_sku, "change": (-1) * quantity, "sku": item_sku})
+            connection.execute(sqlalchemy.text(catalog_ledger), {"transaction_id": transaction_id, "catalog_id": catalog_id, "change": (-1) * quantity, "sku": item_sku})
 
             # remove items from cart_items
             sql_query = """DELETE FROM cart_items WHERE cart_id = :cart_id AND item_sku = :item_sku"""
