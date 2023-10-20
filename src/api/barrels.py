@@ -77,31 +77,10 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     for barrel in wholesale_catalog:
         print(f'''sku: {barrel.sku} \n ml_per_barrel: {barrel.ml_per_barrel} \n potion_type: {barrel.potion_type} \n price: {barrel.price} \n quantity: {barrel.quantity}''')
 
-    # store in prints table
-    wholesale_catalog_json = json.dumps([barrel.dict() for barrel in wholesale_catalog])
     with db.engine.begin() as connection:
-        sql_query = """INSERT INTO prints (category, print_statement)
-                        VALUES ('wholesale_catalog', :wholesale_catalog)"""
-        connection.execute(sqlalchemy.text(sql_query), {"wholesale_catalog": wholesale_catalog_json})
-
-    # Use inventory ledger to get gold and ml 
-    # inventory_ledger_query = """SELECT type, SUM(change) AS total FROM inventory_ledger GROUP BY type"""
-    # inventory_ledger = connection.execute(sqlalchemy.text(inventory_ledger_query))
-    # inventory = {row.type: row.total for row in inventory_ledger}
-    # gold = inventory.get("gold", 0)
-    # num_red_ml = inventory.get("red_ml", 0)
-    # num_green_ml = inventory.get("green_ml", 0)
-    # num_blue_ml = inventory.get("blue_ml", 0)
-    # num_dark_ml = inventory.get("dark_ml", 0)
-    # print(f'''Inventory calculated from ledger: \n gold: {gold} \n num_red_ml: {num_red_ml} \n num_green_ml: {num_green_ml} \n num_blue_ml: {num_blue_ml} \n num_dark_ml: {num_dark_ml}''')
-
-    # get gold value from global_inventory
-    with db.engine.begin() as connection:
-        sql_query = """SELECT gold, num_red_ml, num_green_ml, num_blue_ml, num_dark_ml FROM global_inventory"""
-        inventory = connection.execute(sqlalchemy.text(sql_query)).first()
-        gold, red_ml, green_ml, blue_ml, dark_ml = inventory
-
-    print(f'''Current global inventory: \n gold: {gold} \n red_ml: {red_ml} \n green_ml: {green_ml} \n blue_ml: {blue_ml} \n dark_ml: {dark_ml}''')
+        # Get gold from inventory_ledger
+        inventory_ledger_query = """SELECT SUM(change) AS total FROM inventory_ledger WHERE type = :type"""
+        gold = connection.execute(sqlalchemy.text(inventory_ledger_query), {"type": "gold"}).first()[0] or 0
 
     # sort whole sale primarily by catalog
     wholesale_catalog = sorted(wholesale_catalog, key=lambda x: x.price)
@@ -117,13 +96,11 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
                     "quantity": 1,
                 })
                 barrel_purchased = True
-                # update tracking gold and barrels quanitity in catalog
                 gold -= barrel.price
                 barrel.quantity -= 1
                 print(f'''Barrel added to purchase plan: \n sku: {barrel.sku} \n ml_per_barrel: {barrel.ml_per_barrel} \n potion_type: {barrel.potion_type} \n price: {barrel.price} \n quantity: 1''')
         if not barrel_purchased:
             break
-
 
     return res
         
