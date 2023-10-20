@@ -77,49 +77,62 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
         total_gold_paid = 0
         total_potions_bought = 0
 
+        # form catalog 
+        combined_query = """SELECT 
+                                catalog.sku, 
+                                catalog.name, 
+                                catalog.price, 
+                                catalog.red_ml, 
+                                catalog.green_ml, 
+                                catalog.blue_ml, 
+                                catalog.dark_ml,
+                                COALESCE(ledger.total, 0) AS quantity
+                            FROM 
+                                catalog
+                            LEFT JOIN 
+                                (SELECT 
+                                    sku, 
+                                    SUM(change) AS total 
+                                FROM 
+                                    catalog_ledger 
+                                GROUP BY 
+                                    sku) AS ledger
+                            ON 
+                                catalog.sku = ledger.sku
+                            WHERE
+                                catalog.sku = :item_sku
+                        """
+        
         for item_sku, quantity in cart_items:
-            # get price from catalog, add to total gold paid
-            sql_query = """SELECT price FROM catalog WHERE sku = :item_sku"""
-            result = connection.execute(sqlalchemy.text(sql_query), {"item_sku": item_sku})
-            total_gold_paid += result.first().price * quantity
+            # get price
+            result = connection.execute(sqlalchemy.text(combined_query), {"item_sku": item_sku})
+            price = result.first().price
+            total_gold_paid += price * quantity
             total_potions_bought += quantity
 
-            # NEW - Insert row into transaction table
-            sql_query = """INSERT INTO transactions (description)
-                            VALUES (:description) RETURNING transaction_id"""
-            result = connection.execute(sqlalchemy.text(sql_query), {"description": f"checkout for {item_sku} with quantity {quantity}"})
+            # add gold transaction transactions table
+            gold_transaction = """INSERT INTO transactions (description) VALUES (:description) RETURNING transaction_id"""
+            result = connection.execute(sqlalchemy.text(gold_transaction), {"description": f"""Gold spend on {item_sku}: {price * quantity}"""})
             transaction_id = result.fetchone()[0]
 
-            # NEW - get item price from catalog
-            sql_query = """SELECT price FROM catalog WHERE sku = :item_sku"""
-            result = connection.execute(sqlalchemy.text(sql_query), {"item_sku": item_sku})
-            item_price_new = result.first().price
+            # add gold transaction to inventory_ledger
+            gold_inventory_ledger = """INSERT INTO inventory_ledger (type, change, transaction_id) VALUES (:type, :change, :transaction_id)"""
+            connection.execute(sqlalchemy.text(gold_inventory_ledger), {"type": "gold", "change": (-1) * price * quantity, "transaction_id": transaction_id})
 
-            # NEW - insert row into catalog ledger for potion decrease
-            sql_query = """INSERT INTO catalog_ledger (transaction_id, catalog_id, change, sku, price)
-                            VALUES (:transaction_id, :catalog_id, :change, :sku, :price)"""
-            connection.execute(sqlalchemy.text(sql_query), {"transaction_id": transaction_id, "catalog_id": item_sku, "change": -quantity, "sku": item_sku, "price": item_price_new})
+            # add potion transaction to transactions table
+            potion_transaction = """INSERT INTO transactions (description) VALUES (:description) RETURNING transaction_id"""
+            result = connection.execute(sqlalchemy.text(potion_transaction), {"description": f"""{quantity} of potion type {item_sku} sold."""})
 
-            # NEW - insert row into inventory ledger for gold increase
-            sql_query = """INSERT INTO inventory_ledger (type, change, transaction_id)
-                            VALUES (:type, :change, :transaction_id)"""
-            connection.execute(sqlalchemy.text(sql_query), {"type": "gold", "change": item_price_new * quantity, "transaction_id": transaction_id})
-
-            # NEW - decrease quantity in catalog table
-            sql_query = """UPDATE catalog SET quantity = quantity - :quantity WHERE sku = :item_sku"""
-            connection.execute(sqlalchemy.text(sql_query), {"quantity": quantity, "item_sku": item_sku})
+            # add potion transaction to catalog_ledger
+            catalog_ledger = """INSERT INTO catalog_ledger (transaction_id, catalog_id, change, sku) VALUES (:transaction_id, :catalog_id, :change, :sku)"""
+            connection.execute(sqlalchemy.text(catalog_ledger), {"transaction_id": transaction_id, "catalog_id": item_sku, "change": (-1) * quantity, "sku": item_sku})
 
             # remove items from cart_items
             sql_query = """DELETE FROM cart_items WHERE cart_id = :cart_id AND item_sku = :item_sku"""
             connection.execute(sqlalchemy.text(sql_query), {"cart_id": cart_id, "item_sku": item_sku})
-
-        # update gold in global_inventory
-        sql_query = """UPDATE global_inventory SET gold = gold + :total_gold_paid"""
-        connection.execute(sqlalchemy.text(sql_query), {"total_gold_paid": total_gold_paid})
 
     print(f'''Cart with id = {cart_id} checked out with payment method {cart_checkout.payment}''')
     print(f'''Total gold paid: {total_gold_paid}''')
     print(f'''Total potions bought: {total_potions_bought}''')
 
     return {"total_potions_bought": total_potions_bought, "total_gold_paid": total_gold_paid}
-
