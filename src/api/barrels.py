@@ -30,7 +30,7 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
         # count gold paid and ml delivered
         gold_paid, red_ml, green_ml, blue_ml, dark_ml, type = 0, 0, 0, 0, 0, None
         for barrel in barrels_delivered:
-            gold_paid += gold_paid
+            gold_paid += barrel.price * barrel.quantity
             if barrel.potion_type == [1, 0, 0, 0]: # Red barrel
                 red_ml += barrel.ml_per_barrel * barrel.quantity
                 type = "red_ml"
