@@ -42,7 +42,7 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
             connection.execute(sqlalchemy.text(inventory_ledger), {"type": "dark_ml", "change": dark_ml * quantity, "transaction_id": transaction_id})
 
             # find catalog_id, sku from catalog table
-            catalog_id_query = """SELECT id, sku FROM catalog WHERE num_red_ml = :red_ml AND num_green_ml = :green_ml AND num_blue_ml = :blue_ml AND num_dark_ml = :dark_ml"""
+            catalog_id_query = """SELECT catalog_id, sku FROM catalog WHERE num_red_ml = :red_ml AND num_green_ml = :green_ml AND num_blue_ml = :blue_ml AND num_dark_ml = :dark_ml"""
             result = connection.execute(sqlalchemy.text(catalog_id_query), {"red_ml": red_ml, "green_ml": green_ml, "blue_ml": blue_ml, "dark_ml": dark_ml})
             catalog_id, sku = result.fetchone()
 
@@ -70,7 +70,6 @@ def get_bottle_plan():
 
         # form catalog
         combined_query = """SELECT 
-                                catalog.id, 
                                 catalog.sku, 
                                 catalog.name, 
                                 catalog.price, 
@@ -106,7 +105,7 @@ def get_bottle_plan():
         create_potion = False
         # make potions
         for item in catalog:
-            id, sku, name, price, red_ml, green_ml, blue_ml, dark_ml, quantity = item
+            sku, name, price, red_ml, green_ml, blue_ml, dark_ml, quantity = item
             # if possible
             if (inventory_red_ml >= red_ml) and (inventory_green_ml >= green_ml) and (inventory_blue_ml >= blue_ml) and (inventory_dark_ml >= dark_ml):
                 print(f"""inventory_red_ml: {inventory_red_ml} red_ml: {red_ml}, inventory_green_ml: {inventory_green_ml} green_ml: {green_ml}, inventory_blue_ml: {inventory_blue_ml} blue_ml: {blue_ml}, inventory_dark_ml: {inventory_dark_ml} dark_ml: {dark_ml}""")
