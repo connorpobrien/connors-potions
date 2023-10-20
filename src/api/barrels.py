@@ -28,23 +28,24 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
 
     with db.engine.begin() as connection:
         # count gold paid and ml delivered
-        gold_paid, red_ml, green_ml, blue_ml, dark_ml, type = 0, 0, 0, 0, 0, None
+        gold_paid, red_ml, green_ml, blue_ml, dark_ml, potion_type = 0, 0, 0, 0, 0, None
         for barrel in barrels_delivered:
             gold_paid += barrel.price * barrel.quantity
-            if barrel.potion_type == [1, 0, 0, 0]: # Red barrel
-                red_ml += barrel.ml_per_barrel * barrel.quantity
-                type = "red_ml"
-            elif barrel.potion_type == [0, 1, 0, 0]: # Green barrel
-                green_ml += barrel.ml_per_barrel * barrel.quantity
-                type = "green_ml"
-            elif barrel.potion_type == [0, 0, 1, 0]: # Blue barrel
-                blue_ml += barrel.ml_per_barrel * barrel.quantity
-                type = "blue_ml"
-            elif barrel.potion_type == [0, 0, 0, 1]: # Dark barrel
-                dark_ml += barrel.ml_per_barrel * barrel.quantity
-                type = "dark_ml"
-            else:
-                raise Exception("Invalid potion type")
+            match barrel.potion_type:
+                case [1, 0, 0, 0]:
+                    red_ml += barrel.ml_per_barrel * barrel.quantity
+                    potion_type = "red_ml"
+                case [0, 1, 0, 0]:
+                    green_ml += barrel.ml_per_barrel * barrel.quantity
+                    potion_type = "green_ml"
+                case [0, 0, 1, 0]:
+                    blue_ml += barrel.ml_per_barrel * barrel.quantity
+                    potion_type = "blue_ml"
+                case [0, 0, 0, 1]:
+                    dark_ml += barrel.ml_per_barrel * barrel.quantity
+                    potion_type = "dark_ml"
+                case _:
+                    raise Exception("Invalid potion type")
             
             # add gold transaction to transaction table
             gold_transaction = """INSERT INTO transactions (description) VALUES (:description) RETURNING transaction_id"""
@@ -57,20 +58,16 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
 
             # add ml transaction to transaction table
             ml_transaction = """INSERT INTO transactions (description) VALUES (:description) RETURNING transaction_id"""
-            result = connection.execute(sqlalchemy.text(ml_transaction), {"description": f"""{type} delivered: {barrel.ml_per_barrel * barrel.quantity} from {barrel.sku}"""})
+            result = connection.execute(sqlalchemy.text(ml_transaction), {"description": f"""{potion_type} delivered: {barrel.ml_per_barrel * barrel.quantity} from {barrel.sku}"""})
             transaction_id = result.fetchone()[0]
 
             # add ml transaction to inventory_ledger
             ml_inventory_ledger = """INSERT INTO inventory_ledger (type, change, transaction_id) VALUES (:type, :change, :transaction_id)"""
-            connection.execute(sqlalchemy.text(ml_inventory_ledger), {"type": type, "change": barrel.ml_per_barrel * barrel.quantity, "transaction_id": transaction_id})
+            connection.execute(sqlalchemy.text(ml_inventory_ledger), {"type": potion_type, "change": barrel.ml_per_barrel * barrel.quantity, "transaction_id": transaction_id})
 
         print(f'''Barrels delivered. \n gold_paid: {gold_paid} \n red_ml_received: {red_ml} \n green_ml_received: {green_ml} \n blue_ml_received: {blue_ml} \n dark_ml_received: {dark_ml}''')
 
     return "OK"
-            
-
-
-
     
 # Gets called once a day
 @router.post("/plan")
