@@ -60,16 +60,39 @@ def get_bottle_plan():
     Go from barrel to bottle.
     """
     with db.engine.begin() as connection:
-        # query global
-        sql_query = """SELECT num_red_ml, num_green_ml, num_blue_ml, num_dark_ml FROM global_inventory"""
-        global_inventory = connection.execute(sqlalchemy.text(sql_query)).first()
-        inventory_red_ml, inventory_green_ml, inventory_blue_ml, inventory_dark_ml = global_inventory
-        print(f'''Inventory: red_ml: {inventory_red_ml} green_ml: {inventory_green_ml} blue_ml: {inventory_blue_ml} dark_ml: {inventory_dark_ml}''')
+        # Get gold, red_ml, green_ml, blue_ml, dark_ml from inventory_ledger
+        inventory_ledger_query = """SELECT SUM(change) AS total FROM inventory_ledger WHERE type = :type"""
+        gold = connection.execute(sqlalchemy.text(inventory_ledger_query), {"type": "gold"}).first()[0] or 0
+        inventory_red_ml = connection.execute(sqlalchemy.text(inventory_ledger_query), {"type": "red_ml"}).first()[0] or 0
+        inventory_green_ml = connection.execute(sqlalchemy.text(inventory_ledger_query), {"type": "green_ml"}).first()[0] or 0
+        inventory_blue_ml = connection.execute(sqlalchemy.text(inventory_ledger_query), {"type": "blue_ml"}).first()[0] or 0
+        inventory_dark_ml = connection.execute(sqlalchemy.text(inventory_ledger_query), {"type": "dark_ml"}).first()[0] or 0
 
-    with db.engine.begin() as connection:
-        # query catalog
-        sql_query = """SELECT sku, name, quantity, price, num_red_ml, num_green_ml, num_blue_ml, num_dark_ml FROM catalog"""
-        catalog = connection.execute(sqlalchemy.text(sql_query)).fetchall()
+        # form catalog
+        combined_query = """SELECT 
+                                catalog.id, 
+                                catalog.sku, 
+                                catalog.name, 
+                                catalog.price, 
+                                catalog.red_ml, 
+                                catalog.green_ml, 
+                                catalog.blue_ml, 
+                                catalog.dark_ml,
+                                COALESCE(ledger.total, 0) AS quantity
+                            FROM 
+                                catalog
+                            LEFT JOIN 
+                                (SELECT 
+                                    sku, 
+                                    SUM(change) AS total 
+                                FROM 
+                                    catalog_ledger 
+                                GROUP BY 
+                                    sku) AS ledger
+                            ON 
+                                catalog.sku = ledger.sku
+                        """
+        catalog = connection.execute(sqlalchemy.text(combined_query)).fetchall()
         
     # sort to find potions to replenish
     catalog = sorted(catalog, key=lambda x: x.quantity)
@@ -83,7 +106,7 @@ def get_bottle_plan():
         create_potion = False
         # make potions
         for item in catalog:
-            sku, name, quantity, price, red_ml, green_ml, blue_ml, dark_ml = item
+            id, sku, name, price, red_ml, green_ml, blue_ml, dark_ml, quantity = item
             # if possible
             if (inventory_red_ml >= red_ml) and (inventory_green_ml >= green_ml) and (inventory_blue_ml >= blue_ml) and (inventory_dark_ml >= dark_ml):
                 print(f"""inventory_red_ml: {inventory_red_ml} red_ml: {red_ml}, inventory_green_ml: {inventory_green_ml} green_ml: {green_ml}, inventory_blue_ml: {inventory_blue_ml} blue_ml: {blue_ml}, inventory_dark_ml: {inventory_dark_ml} dark_ml: {dark_ml}""")
