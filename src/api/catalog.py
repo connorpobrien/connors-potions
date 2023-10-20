@@ -40,7 +40,7 @@ def get_catalog():
         for item in catalog:
             sku, name, price, red_ml, green_ml, blue_ml, dark_ml, quantity = item
             if item.quantity > 0:
-                res.append({"sku": item.sku, "name": item.name, "quantity": item.quantity, "price": item.price, "potion_type": [item.num_red_ml, item.num_green_ml, item.num_blue_ml, item.num_dark_ml]})
-                print(f'''Item in catalog: \n sku: {item.sku} \n name: {item.name} \n quantity: {item.quantity} \n price: {item.price} \n potion_type: {item.num_red_ml, item.num_green_ml, item.num_blue_ml, item.num_dark_ml}''')
+                res.append({"sku": item.sku, "name": item.name, "quantity": item.quantity, "price": item.price, "potion_type": [item.red_ml, item.green_ml, item.blue_ml, item.dark_ml]})
+                print(f'''Item in catalog: \n sku: {item.sku} \n name: {item.name} \n quantity: {item.quantity} \n price: {item.price} \n potion_type: {item.red_ml, item.green_ml, item.blue_ml, item.dark_ml}''')
 
         return res
