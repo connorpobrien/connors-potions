@@ -21,8 +21,8 @@ class PotionInventory(BaseModel):
 def post_deliver_bottles(potions_delivered: list[PotionInventory]):
     """"""
     print("Bottles Delivered!")
-    for potion in potions_delivered:
-        print(f'''potion_type: {potion.potion_type} \n quantity: {potion.quantity}''')
+    # for potion in potions_delivered:
+    #     print(f'''potion_type: {potion.potion_type} \n quantity: {potion.quantity}''')
 
     with db.engine.begin() as connection:
         for potion in potions_delivered:
@@ -112,7 +112,7 @@ def get_bottle_plan():
             sku, name, price, red_ml, green_ml, blue_ml, dark_ml, quantity = item
             # if possible
             if (inventory_red_ml >= red_ml) and (inventory_green_ml >= green_ml) and (inventory_blue_ml >= blue_ml) and (inventory_dark_ml >= dark_ml):
-                print(f"""inventory_red_ml: {inventory_red_ml} red_ml: {red_ml}, inventory_green_ml: {inventory_green_ml} green_ml: {green_ml}, inventory_blue_ml: {inventory_blue_ml} blue_ml: {blue_ml}, inventory_dark_ml: {inventory_dark_ml} dark_ml: {dark_ml}""")
+                # print(f"""inventory_red_ml: {inventory_red_ml} red_ml: {red_ml}, inventory_green_ml: {inventory_green_ml} green_ml: {green_ml}, inventory_blue_ml: {inventory_blue_ml} blue_ml: {blue_ml}, inventory_dark_ml: {inventory_dark_ml} dark_ml: {dark_ml}""")
                 # add to bottle plan
                 potion_type = (red_ml, green_ml, blue_ml, dark_ml)
                 if potion_type not in bottle_plan and len(bottle_plan) == 6:
@@ -141,8 +141,8 @@ def get_bottle_plan():
         random.shuffle(catalog)
 
     # print bottle plan
-    for bottle in bottle_plan.values():
-        print(f'''potion_type: {bottle["potion_type"]} quantity: {bottle["quantity"]}''')
+    # for bottle in bottle_plan.values():
+    #     print(f'''potion_type: {bottle["potion_type"]} quantity: {bottle["quantity"]}''')
 
     # return bottle plan, max length 6
     return list(bottle_plan.values())[:6]

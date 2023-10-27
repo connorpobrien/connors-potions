@@ -24,8 +24,8 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
     # TODO: compute logic - test
     # For each barrel delivered, print
     print("Barrels Delivered!")
-    for barrel in barrels_delivered:
-        print(f'''sku: {barrel.sku} \n ml_per_barrel: {barrel.ml_per_barrel} \n potion_type: {barrel.potion_type} \n price: {barrel.price} \n quantity: {barrel.quantity}''')
+    # for barrel in barrels_delivered:
+    #     print(f'''sku: {barrel.sku} \n ml_per_barrel: {barrel.ml_per_barrel} \n potion_type: {barrel.potion_type} \n price: {barrel.price} \n quantity: {barrel.quantity}''')
 
     with db.engine.begin() as connection:
         # count gold paid and ml delivered
@@ -74,9 +74,9 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
 @router.post("/plan")
 def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     """ """
-    print("Wholesale Catalog: ")
-    for barrel in wholesale_catalog:
-        print(f'''sku: {barrel.sku} \n ml_per_barrel: {barrel.ml_per_barrel} \n potion_type: {barrel.potion_type} \n price: {barrel.price} \n quantity: {barrel.quantity}''')
+    # print("Wholesale Catalog: ")
+    # for barrel in wholesale_catalog:
+    #     print(f'''sku: {barrel.sku} \n ml_per_barrel: {barrel.ml_per_barrel} \n potion_type: {barrel.potion_type} \n price: {barrel.price} \n quantity: {barrel.quantity}''')
 
     with db.engine.begin() as connection:
         # Get gold from inventory_ledger
