@@ -21,6 +21,7 @@ class Barrel(BaseModel):
 
 @router.post("/deliver")
 def post_deliver_barrels(barrels_delivered: list[Barrel]):
+    # TODO: compute logic - test
     # For each barrel delivered, print
     print("Barrels Delivered!")
     for barrel in barrels_delivered:
@@ -104,3 +105,4 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
 
     return res
         
+# barrel optimizer - test

@@ -92,6 +92,10 @@ def get_bottle_plan():
                                 catalog.sku = ledger.sku
                         """
         catalog = connection.execute(sqlalchemy.text(combined_query)).fetchall()
+
+        # get total_potions from catalog_ledger
+        catalog_ledger_query = """SELECT SUM(change) AS total FROM catalog_ledger"""
+        total_potions = connection.execute(sqlalchemy.text(catalog_ledger_query)).first()[0] or 0
         
     # sort to find potions to replenish
     catalog = sorted(catalog, key=lambda x: x.quantity)
@@ -101,7 +105,7 @@ def get_bottle_plan():
     bottle_plan = {}
 
     # Make as many potions as possible
-    while True:
+    while total_potions < 300:
         create_potion = False
         # make potions
         for item in catalog:
@@ -124,7 +128,12 @@ def get_bottle_plan():
                 inventory_green_ml -= green_ml
                 inventory_blue_ml -= blue_ml
                 inventory_dark_ml -= dark_ml
+
+                # increase total potions
+                total_potions += 1
             if len(bottle_plan) == 6:
+                break
+            if total_potions == 300:
                 break
         if not create_potion:
             break
