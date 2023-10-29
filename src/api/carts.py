@@ -79,9 +79,9 @@ def search_orders(
 
     # set sort order
     if sort_order is search_sort_order.asc:
-        order_by = sqlalchemy.desc(order_by)
-    elif sort_order is search_sort_order.desc:
         order_by = sqlalchemy.asc(order_by)
+    elif sort_order is search_sort_order.desc:
+        order_by = sqlalchemy.desc(order_by)
     else:
         assert False
 
@@ -114,11 +114,11 @@ def search_orders(
         result = connection.execute(stmt)
         start = offset + 1
         for row in result:
-            transaction_id, created_at, sku, cutomer_name, change, price, total = row
+            transaction_id, created_at, sku, name, change, price, total = row
             res.append({
                 "line_item_id": start,
                 "item_sku": sku,
-                "customer_name": cutomer_name,
+                "customer_name": name,
                 "line_item_total": total,
                 "timestamp": created_at,
             })
