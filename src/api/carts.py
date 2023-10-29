@@ -57,6 +57,13 @@ def search_orders(
     offset = int(search_page) if search_page != "" else 0
     previous = "" if offset - 5 < 0 else str(offset - 5)
     next = 0
+
+    # load tables from database
+    metadata_obj = sqlalchemy.MetaData()
+    carts = sqlalchemy.Table("carts", metadata_obj, autoload_with=db.engine)
+    catalog = sqlalchemy.Table("catalog", metadata_obj, autoload_with=db.engine)
+    transactions = sqlalchemy.Table("transactions", metadata_obj, autoload_with=db.engine)
+    catalog_ledger = sqlalchemy.Table("catalog_ledger", metadata_obj, autoload_with=db.engine)
     
     # set order by
     if sort_col is search_sort_options.customer_name:
@@ -77,13 +84,6 @@ def search_orders(
         order_by = sqlalchemy.asc(order_by)
     else:
         assert False
-
-    # load tables from database
-    metadata_obj = sqlalchemy.MetaData()
-    carts = sqlalchemy.Table("carts", metadata_obj, autoload_with=db.engine)
-    catalog = sqlalchemy.Table("catalog", metadata_obj, autoload_with=db.engine)
-    transactions = sqlalchemy.Table("transactions", metadata_obj, autoload_with=db.engine)
-    catalog_ledger = sqlalchemy.Table("catalog_ledger", metadata_obj, autoload_with=db.engine)
 
     try:
         with db.engine.begin() as connection:
