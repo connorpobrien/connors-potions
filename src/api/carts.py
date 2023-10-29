@@ -98,7 +98,6 @@ def search_orders(
             )
             .join(catalog_ledger, catalog_ledger.c.transaction_id == transactions.c.transaction_id)
             .join(catalog, catalog.c.catalog_id == catalog_ledger.c.catalog_id)
-            .join(carts, carts.c.cart_id == transactions.c.cart_id)
             .offset(offset)
             .order_by(order_by, transactions.c.transaction_id)
             .limit(5)
