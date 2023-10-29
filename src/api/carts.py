@@ -85,52 +85,48 @@ def search_orders(
     else:
         assert False
 
-    try:
-        with db.engine.begin() as connection:
-            stmt = (
-                sqlalchemy.select(
-                    transactions.c.transaction_id,
-                    transactions.c.created_at,
-                    catalog.c.sku,
-                    carts.c.customer_name,
-                    catalog_ledger.c.change,
-                    catalog.c.price,
-                    (catalog_ledger.c.change * catalog.c.price) .label('total'),
-                )
-                .join(catalog_ledger, catalog_ledger.c.transaction_id == transactions.c.transaction_id)
-                .join(catalog, catalog.c.catalog_id == catalog_ledger.c.catalog_id)
-                .join(carts, carts.c.cart_id == transactions.c.cart_id)
-                .offset(offset)
-                .order_by(order_by, transactions.c.transaction_id)
-                .limit(5)
+    with db.engine.begin() as connection:
+        stmt = (
+            sqlalchemy.select(
+                transactions.c.transaction_id,
+                transactions.c.created_at,
+                catalog.c.sku,
+                carts.c.customer_name,
+                catalog_ledger.c.change,
+                catalog.c.price,
+                (catalog_ledger.c.change * catalog.c.price) .label('total'),
             )
+            .join(catalog_ledger, catalog_ledger.c.transaction_id == transactions.c.transaction_id)
+            .join(catalog, catalog.c.catalog_id == catalog_ledger.c.catalog_id)
+            .join(carts, carts.c.cart_id == transactions.c.cart_id)
+            .offset(offset)
+            .order_by(order_by, transactions.c.transaction_id)
+            .limit(5)
+        )
 
-            if customer_name != "":
-                stmt = stmt.where(carts.c.customer_name.ilike(f"%{customer_name}%"))
-            
-            if potion_sku != "":
-                stmt = stmt.where(catalog.c.sku.ilike(f"%{potion_sku}%"))
+        if customer_name != "":
+            stmt = stmt.where(carts.c.customer_name.ilike(f"%{customer_name}%"))
+        
+        if potion_sku != "":
+            stmt = stmt.where(catalog.c.sku.ilike(f"%{potion_sku}%"))
 
-            res = []
-            result = connection.execute(stmt)
-            start = offset + 1
-            for row in result:
-                transaction_id, created_at, sku, cutomer_name, change, price, total = row
-                res.append({
-                    "line_item_id": start,
-                    "item_sku": sku,
-                    "customer_name": cutomer_name,
-                    "line_item_total": total,
-                    "timestamp": created_at,
-                })
-                start += 1
-            
-            # set offset for next page
-            next = str(offset + 5) if len(res) == 5 else ""
+        res = []
+        result = connection.execute(stmt)
+        start = offset + 1
+        for row in result:
+            transaction_id, created_at, sku, cutomer_name, change, price, total = row
+            res.append({
+                "line_item_id": start,
+                "item_sku": sku,
+                "customer_name": cutomer_name,
+                "line_item_total": total,
+                "timestamp": created_at,
+            })
+            start += 1
+        
+        # set offset for next page
+        next = str(offset + 5) if len(res) == 5 else ""
     
-    except Exception as e:
-        print(e)
-        return {"error": "Something went wrong with the query."}
 
     return {
         "previous": previous,
