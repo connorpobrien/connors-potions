@@ -53,22 +53,90 @@ def search_orders(
     Your results must be paginated, the max results you can return at any
     time is 5 total line items.
     """
+    # set offsets
+    offset = int(search_page) if search_page != "" else 0
+    previous = "" if offset - 5 < 0 else str(offset - 5)
+    next = 0
+    
+    # set order by
+    if sort_col is search_sort_options.customer_name:
+        order_by = carts.c.customer_name
+    elif sort_col is search_sort_options.item_sku:
+        order_by = catalog.c.name
+    elif sort_col is search_sort_options.line_item_total:
+        order_by = 'total'
+    elif sort_col is search_sort_options.timestamp:
+        order_by = transactions.c.created_at
+    else:
+        assert False
+
+    # set sort order
+    if sort_order is search_sort_order.asc:
+        order_by = sqlalchemy.desc(order_by)
+    elif sort_order is search_sort_order.desc:
+        order_by = sqlalchemy.asc(order_by)
+    else:
+        assert False
+
+    # load tables from database
+    metadata_obj = sqlalchemy.MetaData()
+    carts = sqlalchemy.Table("carts", metadata_obj, autoload_with=db.engine)
+    catalog = sqlalchemy.Table("catalog", metadata_obj, autoload_with=db.engine)
+    transactions = sqlalchemy.Table("transactions", metadata_obj, autoload_with=db.engine)
+    catalog_ledger = sqlalchemy.Table("catalog_ledger", metadata_obj, autoload_with=db.engine)
+
+    try:
+        with db.engine.begin() as connection:
+            stmt = (
+                sqlalchemy.select(
+                    transactions.c.transaction_id,
+                    transactions.c.created_at,
+                    catalog.c.sku,
+                    carts.c.customer_name,
+                    catalog_ledger.c.change,
+                    catalog.c.price,
+                    (catalog_ledger.c.change * catalog.c.price) .label('total'),
+                )
+                .join(catalog_ledger, catalog_ledger.c.transaction_id == transactions.c.transaction_id)
+                .join(catalog, catalog.c.catalog_id == catalog_ledger.c.catalog_id)
+                .join(carts, carts.c.cart_id == transactions.c.cart_id)
+                .offset(offset)
+                .order_by(order_by, transactions.c.transaction_id)
+                .limit(5)
+            )
+
+            if customer_name != "":
+                stmt = stmt.where(carts.c.customer_name.ilike(f"%{customer_name}%"))
+            
+            if potion_sku != "":
+                stmt = stmt.where(catalog.c.sku.ilike(f"%{potion_sku}%"))
+
+            res = []
+            result = connection.execute(stmt)
+            start = offset + 1
+            for row in result:
+                transaction_id, created_at, sku, cutomer_name, change, price, total = row
+                res.append({
+                    "line_item_id": start,
+                    "item_sku": sku,
+                    "customer_name": cutomer_name,
+                    "line_item_total": total,
+                    "timestamp": created_at,
+                })
+                start += 1
+            
+            # set offset for next page
+            next = str(offset + 5) if len(res) == 5 else ""
+    
+    except Exception as e:
+        print(e)
+        return {"error": "Something went wrong with the query."}
 
     return {
-        "previous": "",
-        "next": "",
-        "results": [
-            {
-                "line_item_id": 1,
-                "item_sku": "1 oblivion potion",
-                "customer_name": "Scaramouche",
-                "line_item_total": 50,
-                "timestamp": "2021-01-01T00:00:00Z",
-            }
-        ],
+        "previous": previous,
+        "next": next,
+        "results": res,
     }
-
-
 
 class NewCart(BaseModel):
     customer: str
@@ -192,9 +260,9 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
             catalog_ledger = """INSERT INTO catalog_ledger (transaction_id, catalog_id, change, sku) VALUES (:transaction_id, :catalog_id, :change, :sku)"""
             connection.execute(sqlalchemy.text(catalog_ledger), {"transaction_id": transaction_id, "catalog_id": catalog_id, "change": (-1) * quantity, "sku": item_sku})
 
-            # remove items from cart_items
-            sql_query = """DELETE FROM cart_items WHERE cart_id = :cart_id AND item_sku = :item_sku"""
-            connection.execute(sqlalchemy.text(sql_query), {"cart_id": cart_id, "item_sku": item_sku})
+            # set cart checked out to true
+            sql_query = """UPDATE carts SET checked_out = true WHERE cart_id = :cart_id"""
+            connection.execute(sqlalchemy.text(sql_query), {"cart_id": cart_id})
 
     print(f'''Cart with id = {cart_id} checked out with payment method {cart_checkout.payment}''')
     print(f'''Total gold paid: {total_gold_paid}''')
