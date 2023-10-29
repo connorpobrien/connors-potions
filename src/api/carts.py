@@ -98,6 +98,7 @@ def search_orders(
             )
             .join(catalog_ledger, catalog_ledger.c.transaction_id == transactions.c.transaction_id)
             .join(catalog, catalog.c.catalog_id == catalog_ledger.c.catalog_id)
+            .join(carts, carts.c.cart_id == transactions.c.cart_id)
             .offset(offset)
             .order_by(order_by, transactions.c.transaction_id)
             .limit(5)
@@ -234,8 +235,8 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
             total_potions_bought += quantity
 
             # add gold transaction transactions table
-            gold_transaction = """INSERT INTO transactions (description) VALUES (:description) RETURNING transaction_id"""
-            result = connection.execute(sqlalchemy.text(gold_transaction), {"description": f"""Gold spend on {item_sku}: {price * quantity}"""})
+            gold_transaction = """INSERT INTO transactions (description, cart_id) VALUES (:description, :cart_id) RETURNING transaction_id"""
+            result = connection.execute(sqlalchemy.text(gold_transaction), {"description": f"""Gold spend on {item_sku}: {price * quantity}""", "cart_id": cart_id})
             transaction_id = result.fetchone()[0]
 
             # add gold transaction to inventory_ledger
@@ -243,8 +244,8 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
             connection.execute(sqlalchemy.text(gold_inventory_ledger), {"type": "gold", "change": price * quantity, "transaction_id": transaction_id})
 
             # add potion transaction to transactions table
-            potion_transaction = """INSERT INTO transactions (description) VALUES (:description) RETURNING transaction_id"""
-            result = connection.execute(sqlalchemy.text(potion_transaction), {"description": f"""{quantity} of potion type {item_sku} sold."""})
+            potion_transaction = """INSERT INTO transactions (description, cart_id) VALUES (:description, :cart_id) RETURNING transaction_id"""
+            result = connection.execute(sqlalchemy.text(potion_transaction), {"description": f"""{quantity} of potion type {item_sku} sold.""", "cart_id": cart_id})
 
             # find catalog_id, sku from catalog table
             catalog_id_query = """SELECT catalog_id FROM catalog WHERE sku = :sku"""
