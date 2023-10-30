@@ -100,7 +100,7 @@ def get_bottle_plan():
     # sort to find potions to replenish
     catalog = sorted(catalog, key=lambda x: x.quantity)
     # disregard potions that have dark_ml for now
-    catalog = [item for item in catalog if item.dark_ml == 0]
+    # catalog = [item for item in catalog if item.dark_ml == 0]
 
     bottle_plan = {}
 
@@ -138,11 +138,7 @@ def get_bottle_plan():
         if not create_potion:
             break
         # randomize order of catalog for next iteration
-        random.shuffle(catalog)
-
-    # print bottle plan
-    # for bottle in bottle_plan.values():
-    #     print(f'''potion_type: {bottle["potion_type"]} quantity: {bottle["quantity"]}''')
+        # random.shuffle(catalog)
 
     # return bottle plan, max length 6
     return list(bottle_plan.values())[:6]

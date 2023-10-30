@@ -98,10 +98,10 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
         redbudget, greenbudget = 100, 100
     elif 300 <= gold < 400:
         split = gold//3
-        redbudget, greenbudget, bluebudget = split
+        redbudget, greenbudget, bluebudget = split, split, split
     else:
         split = gold//4
-        redbudget, greenbudget, bluebudget, darkbudget = split
+        redbudget, greenbudget, bluebudget, darkbudget = split, split, split, split
 
     res = []
 
