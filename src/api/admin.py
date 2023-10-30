@@ -33,8 +33,6 @@ def reset():
         delete_catalog = """DELETE FROM catalog"""
         connection.execute(sqlalchemy.text(delete_catalog))
 
-
-
         print("Successfully deleted all tables")
 
         # Process gold transaction - set to 100
