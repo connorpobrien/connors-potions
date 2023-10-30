@@ -93,7 +93,7 @@ def get_bottle_plan():
                         """
         catalog = connection.execute(sqlalchemy.text(combined_query)).fetchall()
 
-        top_four_query = """SELECT 
+        main_potions_query = """SELECT 
                                 catalog.sku, 
                                 catalog.name, 
                                 catalog.price, 
@@ -115,11 +115,11 @@ def get_bottle_plan():
                             ON 
                                 catalog.sku = ledger.sku
                             WHERE 
-                                catalog.sku IN ('100_0_0_0', '0_100_0_0', '0_0_100_0', '0_0_0_100')
+                                catalog.sku IN ('100_0_0_0', '0_100_0_0', '0_0_100_0', '0_0_0_100', '50_50_0_0', '50_0_50_0', '50_0_0_50', '0_50_0_50', '0_0_50_50')
                             AND 
-                                COALESCE(ledger.total, 0) < 20
+                                COALESCE(ledger.total, 0) < 15
                         """
-        first_four_catalog = connection.execute(sqlalchemy.text(top_four_query)).fetchall()
+        main_potions = connection.execute(sqlalchemy.text(main_potions_query)).fetchall()
 
         # get total_potions from catalog_ledger
         catalog_ledger_query = """SELECT SUM(change) AS total FROM catalog_ledger"""
@@ -128,10 +128,11 @@ def get_bottle_plan():
     # sort to find potions to replenish
     catalog = sorted(catalog, key=lambda x: x.quantity)
 
-    while len(first_four_catalog) < 6:
-        first_four_catalog.append(catalog.pop())
+    # sort main_potions by quantity min -> max and choose bottom 6
+    main_potions = sorted(main_potions, key=lambda x: x.quantity)[:6]
 
-    dedided_catalog = first_four_catalog
+    while len(main_potions) < 6:
+        main_potions.append(catalog.pop())
 
     bottle_plan = {}
 
@@ -140,7 +141,7 @@ def get_bottle_plan():
         create_potion = False
         
         # make potions
-        for item in dedided_catalog:
+        for item in main_potions:
             sku, name, price, red_ml, green_ml, blue_ml, dark_ml, quantity = item
             # if possible
             if (inventory_red_ml >= red_ml) and (inventory_green_ml >= green_ml) and (inventory_blue_ml >= blue_ml) and (inventory_dark_ml >= dark_ml):
