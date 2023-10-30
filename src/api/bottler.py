@@ -126,7 +126,7 @@ def get_bottle_plan():
         total_potions = connection.execute(sqlalchemy.text(catalog_ledger_query)).first()[0] or 0
 
     # sort to find potions to replenish
-    catalog = sorted(catalog, key=lambda x: x.quantity)
+    catalog = sorted(catalog, key=lambda x: x.quantity, reverse=True)
 
     # sort main_potions by quantity min -> max and choose bottom 6
     main_potions = sorted(main_potions, key=lambda x: x.quantity)[:6]
