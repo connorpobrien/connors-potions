@@ -91,6 +91,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     dark_catalog = [barrel for barrel in wholesale_catalog if barrel.potion_type == [0, 0, 0, 1]]
 
     # determine budget for each type
+    redbudget = greenbudget = bluebudget = darkbudget = 0
     if gold < 200:
         redbudget = 100
     elif gold < 300:
@@ -115,6 +116,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
                     "sku": barrel.sku,
                     "quantity": 1,
                 })
+                barrel_purchased = True
                 redbudget -= barrel.price
                 barrel.quantity -= 1
                 print(f'''Barrel added to purchase plan: \n sku: {barrel.sku} \n ml_per_barrel: {barrel.ml_per_barrel} \n potion_type: {barrel.potion_type} \n price: {barrel.price} \n quantity: 1''')
@@ -133,6 +135,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
                     "sku": barrel.sku,
                     "quantity": 1,
                 })
+                barrel_purchased = True
                 greenbudget -= barrel.price
                 barrel.quantity -= 1
                 print(f'''Barrel added to purchase plan: \n sku: {barrel.sku} \n ml_per_barrel: {barrel.ml_per_barrel} \n potion_type: {barrel.potion_type} \n price: {barrel.price} \n quantity: 1''')
@@ -151,6 +154,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
                     "sku": barrel.sku,
                     "quantity": 1,
                 })
+                barrel_purchased = True
                 bluebudget -= barrel.price
                 barrel.quantity -= 1
                 print(f'''Barrel added to purchase plan: \n sku: {barrel.sku} \n ml_per_barrel: {barrel.ml_per_barrel} \n potion_type: {barrel.potion_type} \n price: {barrel.price} \n quantity: 1''')
@@ -169,6 +173,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
                     "sku": barrel.sku,
                     "quantity": 1,
                 })
+                barrel_purchased = True
                 darkbudget -= barrel.price
                 barrel.quantity -= 1
                 print(f'''Barrel added to purchase plan: \n sku: {barrel.sku} \n ml_per_barrel: {barrel.ml_per_barrel} \n potion_type: {barrel.potion_type} \n price: {barrel.price} \n quantity: 1''')
