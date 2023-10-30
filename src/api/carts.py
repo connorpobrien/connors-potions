@@ -94,7 +94,7 @@ def search_orders(
                 carts.c.customer_name,
                 catalog_ledger.c.change,
                 catalog.c.price,
-                (catalog_ledger.c.change * catalog.c.price) .label('total'),
+                abs((catalog_ledger.c.change * catalog.c.price)) .label('total'),
             )
             .join(catalog_ledger, catalog_ledger.c.transaction_id == transactions.c.transaction_id)
             .join(catalog, catalog.c.catalog_id == catalog_ledger.c.catalog_id)
