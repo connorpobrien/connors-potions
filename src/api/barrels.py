@@ -115,7 +115,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
                 barrel_purchased = True
                 redbudget -= barrel.price
                 barrel.quantity -= 1
-                print(f'''Barrel added to purchase plan: \n sku: {barrel.sku} \n ml_per_barrel: {barrel.ml_per_barrel} \n potion_type: {barrel.potion_type} \n price: {barrel.price} \n quantity: {res[barrel.sku]["quantity"]}''')
+                # print(f'''Barrel added to purchase plan: \n sku: {barrel.sku} \n ml_per_barrel: {barrel.ml_per_barrel} \n potion_type: {barrel.potion_type} \n price: {barrel.price} \n quantity: {res[barrel.sku]["quantity"]}''')
         if not barrel_purchased:
             break
 
@@ -134,7 +134,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
                 barrel_purchased = True
                 greenbudget -= barrel.price
                 barrel.quantity -= 1
-                print(f'''Barrel added to purchase plan: \n sku: {barrel.sku} \n ml_per_barrel: {barrel.ml_per_barrel} \n potion_type: {barrel.potion_type} \n price: {barrel.price} \n quantity: {res[barrel.sku]["quantity"]}''')
+                # print(f'''Barrel added to purchase plan: \n sku: {barrel.sku} \n ml_per_barrel: {barrel.ml_per_barrel} \n potion_type: {barrel.potion_type} \n price: {barrel.price} \n quantity: {res[barrel.sku]["quantity"]}''')
         if not barrel_purchased:
             break
 
@@ -153,7 +153,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
                 barrel_purchased = True
                 bluebudget -= barrel.price
                 barrel.quantity -= 1
-                print(f'''Barrel added to purchase plan: \n sku: {barrel.sku} \n ml_per_barrel: {barrel.ml_per_barrel} \n potion_type: {barrel.potion_type} \n price: {barrel.price} \n quantity: {res[barrel.sku]["quantity"]}''')
+                # print(f'''Barrel added to purchase plan: \n sku: {barrel.sku} \n ml_per_barrel: {barrel.ml_per_barrel} \n potion_type: {barrel.potion_type} \n price: {barrel.price} \n quantity: {res[barrel.sku]["quantity"]}''')
         if not barrel_purchased:
             break
 
@@ -172,8 +172,9 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
                 barrel_purchased = True
                 darkbudget -= barrel.price
                 barrel.quantity -= 1
-                print(f'''Barrel added to purchase plan: \n sku: {barrel.sku} \n ml_per_barrel: {barrel.ml_per_barrel} \n potion_type: {barrel.potion_type} \n price: {barrel.price} \n quantity: {res[barrel.sku]["quantity"]}''')
+                # print(f'''Barrel added to purchase plan: \n sku: {barrel.sku} \n ml_per_barrel: {barrel.ml_per_barrel} \n potion_type: {barrel.potion_type} \n price: {barrel.price} \n quantity: {res[barrel.sku]["quantity"]}''')
         if not barrel_purchased:
             break
 
+    print(res.values())
     return list(res.values())
