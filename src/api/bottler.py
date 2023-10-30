@@ -117,7 +117,7 @@ def get_bottle_plan():
                             WHERE 
                                 catalog.sku IN ('100_0_0_0', '0_100_0_0', '0_0_100_0', '0_0_0_100', '50_50_0_0', '50_0_50_0', '50_0_0_50', '0_50_0_50', '0_0_50_50')
                             AND 
-                                COALESCE(ledger.total, 0) < 15
+                                COALESCE(ledger.total, 0) < 1
                         """
         main_potions = connection.execute(sqlalchemy.text(main_potions_query)).fetchall()
 
