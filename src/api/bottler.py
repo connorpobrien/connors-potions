@@ -93,15 +93,45 @@ def get_bottle_plan():
                         """
         catalog = connection.execute(sqlalchemy.text(combined_query)).fetchall()
 
+        top_four_query = """SELECT 
+                                catalog.sku, 
+                                catalog.name, 
+                                catalog.price, 
+                                catalog.red_ml, 
+                                catalog.green_ml, 
+                                catalog.blue_ml, 
+                                catalog.dark_ml,
+                                COALESCE(ledger.total, 0) AS quantity
+                            FROM 
+                                catalog
+                            LEFT JOIN 
+                                (SELECT 
+                                    sku, 
+                                    SUM(change) AS total 
+                                FROM 
+                                    catalog_ledger 
+                                GROUP BY 
+                                    sku) AS ledger
+                            ON 
+                                catalog.sku = ledger.sku
+                            WHERE 
+                                catalog.sku IN ("100_0_0_0", "0_100_0_0", "0_0_100_0", "0_0_0_100", "50_50_0_0", "50_0_50_0")
+                            AND 
+                                COALESCE(ledger.total, 0) < 5
+                        """
+        first_four_catalog = connection.execute(sqlalchemy.text(top_four_query)).fetchall()
+
         # get total_potions from catalog_ledger
         catalog_ledger_query = """SELECT SUM(change) AS total FROM catalog_ledger"""
         total_potions = connection.execute(sqlalchemy.text(catalog_ledger_query)).first()[0] or 0
-        
+
     # sort to find potions to replenish
     catalog = sorted(catalog, key=lambda x: x.quantity)
 
-    # only take first 6 from catalog
-    catalog = catalog[:6]
+    while len(first_four_catalog) < 6:
+        first_four_catalog.append(catalog.pop())
+
+    dedided_catalog = first_four_catalog
 
     bottle_plan = {}
 
@@ -110,7 +140,7 @@ def get_bottle_plan():
         create_potion = False
         
         # make potions
-        for item in catalog:
+        for item in dedided_catalog:
             sku, name, price, red_ml, green_ml, blue_ml, dark_ml, quantity = item
             # if possible
             if (inventory_red_ml >= red_ml) and (inventory_green_ml >= green_ml) and (inventory_blue_ml >= blue_ml) and (inventory_dark_ml >= dark_ml):
