@@ -65,8 +65,7 @@ def reset():
                             [50, 0, 25, 25],
                             [75, 0, 0, 25],
                             [75, 0, 25, 0],
-                            [75, 25, 0, 0],
-                            ]
+                            [75, 25, 0, 0]]
 
         for i in range(len(possible_potions)):
             red_ml, green_ml, blue_ml, dark_ml = possible_potions[i]
