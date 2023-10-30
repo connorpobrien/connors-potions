@@ -95,12 +95,12 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
         redbudget = 100
     elif gold < 300:
         redbudget, greenbudget = 100, 100
-    elif gold > 400:
-        split = gold//4
-        redbudget, greenbudget, bluebudget, darkbudget = split
-    else:
+    elif 300 <= gold < 400:
         split = gold//3
         redbudget, greenbudget, bluebudget = split
+    else:
+        split = gold//4
+        redbudget, greenbudget, bluebudget, darkbudget = split
 
     res = []
 
@@ -108,7 +108,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     red_catalog = sorted(red_catalog, key=lambda x: x.price, reverse=True)
     # buy as many reds as possible
     while True:
-        barrel_purchased = True
+        barrel_purchased = False
         for barrel in red_catalog:
             if barrel.price <= redbudget and barrel.quantity > 0:
                 res.append({
@@ -126,7 +126,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     green_catalog = sorted(green_catalog, key=lambda x: x.price, reverse=True)
     # buy as many greens as possible
     while True:
-        barrel_purchased = True
+        barrel_purchased = False
         for barrel in green_catalog:
             if barrel.price <= greenbudget and barrel.quantity > 0:
                 res.append({
@@ -144,7 +144,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     blue_catalog = sorted(blue_catalog, key=lambda x: x.price, reverse=True)
     # buy as many blues as possible
     while True:
-        barrel_purchased = True
+        barrel_purchased = False
         for barrel in blue_catalog:
             if barrel.price <= bluebudget and barrel.quantity > 0:
                 res.append({
@@ -162,7 +162,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     dark_catalog = sorted(dark_catalog, key=lambda x: x.price, reverse=True)
     # buy as many darks as possible
     while True:
-        barrel_purchased = True
+        barrel_purchased = False
         for barrel in dark_catalog:
             if barrel.price <= darkbudget and barrel.quantity > 0:
                 res.append({
@@ -174,6 +174,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
                 print(f'''Barrel added to purchase plan: \n sku: {barrel.sku} \n ml_per_barrel: {barrel.ml_per_barrel} \n potion_type: {barrel.potion_type} \n price: {barrel.price} \n quantity: 1''')
         if not barrel_purchased:
             break
+
 
     return res
 
