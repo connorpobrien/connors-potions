@@ -99,24 +99,22 @@ def get_bottle_plan():
         
     # sort to find potions to replenish
     catalog = sorted(catalog, key=lambda x: x.quantity)
-    # disregard potions that have dark_ml for now
-    # catalog = [item for item in catalog if item.dark_ml == 0]
+
+    # only take first 6 from catalog
+    catalog = catalog[:6]
 
     bottle_plan = {}
 
     # Make as many potions as possible
     while total_potions < 300:
         create_potion = False
+        
         # make potions
         for item in catalog:
             sku, name, price, red_ml, green_ml, blue_ml, dark_ml, quantity = item
             # if possible
             if (inventory_red_ml >= red_ml) and (inventory_green_ml >= green_ml) and (inventory_blue_ml >= blue_ml) and (inventory_dark_ml >= dark_ml):
-                # print(f"""inventory_red_ml: {inventory_red_ml} red_ml: {red_ml}, inventory_green_ml: {inventory_green_ml} green_ml: {green_ml}, inventory_blue_ml: {inventory_blue_ml} blue_ml: {blue_ml}, inventory_dark_ml: {inventory_dark_ml} dark_ml: {dark_ml}""")
-                # add to bottle plan
                 potion_type = (red_ml, green_ml, blue_ml, dark_ml)
-                if potion_type not in bottle_plan and len(bottle_plan) == 6:
-                    continue
                 if potion_type in bottle_plan:
                     bottle_plan[potion_type]["quantity"] += 1
                 else:
@@ -131,8 +129,6 @@ def get_bottle_plan():
 
                 # increase total potions
                 total_potions += 1
-            if len(bottle_plan) == 6:
-                break
             if total_potions == 300:
                 break
         if not create_potion:
