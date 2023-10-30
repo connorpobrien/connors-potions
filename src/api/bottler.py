@@ -133,8 +133,6 @@ def get_bottle_plan():
                 break
         if not create_potion:
             break
-        # randomize order of catalog for next iteration
-        # random.shuffle(catalog)
 
     # return bottle plan, max length 6
-    return list(bottle_plan.values())[:6]
+    return list(bottle_plan.values())
