@@ -4,6 +4,7 @@ from src.api import auth
 import sqlalchemy
 from src import database as db
 from enum import Enum
+from sqlalchemy import func
 
 router = APIRouter(
     prefix="/carts",
@@ -94,7 +95,7 @@ def search_orders(
                 carts.c.customer_name,
                 catalog_ledger.c.change,
                 catalog.c.price,
-                abs((catalog_ledger.c.change * catalog.c.price)) .label('total'),
+                func.abs((catalog_ledger.c.change * catalog.c.price)).label('total'),
             )
             .join(catalog_ledger, catalog_ledger.c.transaction_id == transactions.c.transaction_id)
             .join(catalog, catalog.c.catalog_id == catalog_ledger.c.catalog_id)
