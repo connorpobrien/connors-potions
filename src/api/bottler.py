@@ -115,9 +115,9 @@ def get_bottle_plan():
                             ON 
                                 catalog.sku = ledger.sku
                             WHERE 
-                                catalog.sku IN ("100_0_0_0", "0_100_0_0", "0_0_100_0", "0_0_0_100", "50_50_0_0", "50_0_50_0")
+                                catalog.sku IN ('100_0_0_0', '0_100_0_0', '0_0_100_0', '0_0_0_100')
                             AND 
-                                COALESCE(ledger.total, 0) < 5
+                                COALESCE(ledger.total, 0) < 20
                         """
         first_four_catalog = connection.execute(sqlalchemy.text(top_four_query)).fetchall()
 
