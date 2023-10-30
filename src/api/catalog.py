@@ -35,6 +35,9 @@ def get_catalog():
                             """
         catalog = connection.execute(sqlalchemy.text(combined_query)).fetchall()
 
+        # sort catalog by quantity high -> low
+        catalog.sort(key=lambda x: x.quantity, reverse=True)
+
         # build output list
         res = []
         for item in catalog:
@@ -43,4 +46,5 @@ def get_catalog():
                 res.append({"sku": item.sku, "name": item.name, "quantity": item.quantity, "price": item.price, "potion_type": [item.red_ml, item.green_ml, item.blue_ml, item.dark_ml]})
                 print(f'''Item in catalog: \n sku: {item.sku} \n name: {item.name} \n quantity: {item.quantity} \n price: {item.price} \n potion_type: {item.red_ml, item.green_ml, item.blue_ml, item.dark_ml}''')
 
-        return res
+        # return max 20
+        return res[:20]
