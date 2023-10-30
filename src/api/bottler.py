@@ -165,5 +165,7 @@ def get_bottle_plan():
         if not create_potion:
             break
 
+    print(bottle_plan.values())
+
     # return bottle plan, max length 6
     return list(bottle_plan.values())
