@@ -70,33 +70,34 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
 @router.post("/plan")
 def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     """ """
+    print(wholesale_catalog)
 
     with db.engine.begin() as connection:
         # Get gold from inventory_ledger
         inventory_ledger_query = """SELECT SUM(change) AS total FROM inventory_ledger WHERE type = :type"""
         gold = connection.execute(sqlalchemy.text(inventory_ledger_query), {"type": "gold"}).first()[0] or 0
 
-    if gold < 100:
-        return []
-
     # sort catalog by color
-    red_catalog = sorted([barrel for barrel in wholesale_catalog if barrel.potion_type == [1, 0, 0, 0]], key=lambda x: x.price, reverse=True)
-    green_catalog = sorted([barrel for barrel in wholesale_catalog if barrel.potion_type == [0, 1, 0, 0]], key=lambda x: x.price, reverse=True)
-    blue_catalog = sorted([barrel for barrel in wholesale_catalog if barrel.potion_type == [0, 0, 1, 0]], key=lambda x: x.price, reverse=True)
-    dark_catalog = sorted([barrel for barrel in wholesale_catalog if barrel.potion_type == [0, 0, 0, 1]], key=lambda x: x.price, reverse=True)
+    red_catalog = sorted([b for b in wholesale_catalog if b.potion_type == [1, 0, 0, 0]], key=lambda x: x.ml_per_barrel / x.price, reverse=True)
+    green_catalog = sorted([b for b in wholesale_catalog if b.potion_type == [0, 1, 0, 0]], key=lambda x: x.ml_per_barrel / x.price, reverse=True)
+    blue_catalog = sorted([b for b in wholesale_catalog if b.potion_type == [0, 0, 1, 0]], key=lambda x: x.ml_per_barrel / x.price, reverse=True)
+    dark_catalog = sorted([b for b in wholesale_catalog if b.potion_type == [0, 0, 0, 1]], key=lambda x: x.ml_per_barrel / x.price, reverse=True)
+
 
     # determine budget for each type
     redbudget = greenbudget = bluebudget = darkbudget = 0
     if gold < 200:
-        redbudget = 100
+        redbudget = gold
     elif gold < 300:
-        redbudget, greenbudget = 100, 100
+        redbudget, greenbudget = gold-100, 100
     elif 300 <= gold < 400:
         split = gold//3
         redbudget, greenbudget, bluebudget = split, split, split
     else:
         split = gold//4
         redbudget, greenbudget, bluebudget, darkbudget = split, split, split, split
+
+    print(f'''Budgets: \n redbudget: {redbudget} \n greenbudget: {greenbudget} \n bluebudget: {bluebudget} \n darkbudget: {darkbudget}''')
 
     res = {}
 
@@ -105,16 +106,18 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
         barrel_purchased = False
         for barrel in red_catalog:
             if barrel.price <= redbudget and barrel.quantity > 0:
+                max_purchase_by_budget = redbudget // barrel.price
+                quantity_to_purchase = min(max_purchase_by_budget, barrel.quantity)
                 if barrel.sku in res:
-                    res[barrel.sku]["quantity"] += 1
+                    res[barrel.sku]["quantity"] += quantity_to_purchase
                 else:
                     res[barrel.sku] = {
                         "sku": barrel.sku,
-                        "quantity": 1
+                        "quantity": quantity_to_purchase
                     }
                 barrel_purchased = True
-                redbudget -= barrel.price
-                barrel.quantity -= 1
+                redbudget -= barrel.price * quantity_to_purchase
+                barrel.quantity -= quantity_to_purchase
                 # print(f'''Barrel added to purchase plan: \n sku: {barrel.sku} \n ml_per_barrel: {barrel.ml_per_barrel} \n potion_type: {barrel.potion_type} \n price: {barrel.price} \n quantity: {res[barrel.sku]["quantity"]}''')
         if not barrel_purchased:
             break
@@ -124,16 +127,18 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
         barrel_purchased = False
         for barrel in green_catalog:
             if barrel.price <= greenbudget and barrel.quantity > 0:
+                max_purchase_by_budget = greenbudget // barrel.price
+                quantity_to_purchase = min(max_purchase_by_budget, barrel.quantity)
                 if barrel.sku in res:
-                    res[barrel.sku]["quantity"] += 1
+                    res[barrel.sku]["quantity"] += quantity_to_purchase
                 else:
                     res[barrel.sku] = {
                         "sku": barrel.sku,
-                        "quantity": 1
+                        "quantity": quantity_to_purchase
                     }
                 barrel_purchased = True
-                greenbudget -= barrel.price
-                barrel.quantity -= 1
+                greenbudget -= barrel.price * quantity_to_purchase
+                barrel.quantity -= quantity_to_purchase
                 # print(f'''Barrel added to purchase plan: \n sku: {barrel.sku} \n ml_per_barrel: {barrel.ml_per_barrel} \n potion_type: {barrel.potion_type} \n price: {barrel.price} \n quantity: {res[barrel.sku]["quantity"]}''')
         if not barrel_purchased:
             break
@@ -143,16 +148,18 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
         barrel_purchased = False
         for barrel in blue_catalog:
             if barrel.price <= bluebudget and barrel.quantity > 0:
+                max_purchase_by_budget = bluebudget // barrel.price
+                quantity_to_purchase = min(max_purchase_by_budget, barrel.quantity)
                 if barrel.sku in res:
-                    res[barrel.sku]["quantity"] += 1
+                    res[barrel.sku]["quantity"] += quantity_to_purchase
                 else:
                     res[barrel.sku] = {
                         "sku": barrel.sku,
-                        "quantity": 1
+                        "quantity": quantity_to_purchase
                     }
                 barrel_purchased = True
-                bluebudget -= barrel.price
-                barrel.quantity -= 1
+                bluebudget -= barrel.price * quantity_to_purchase
+                barrel.quantity -= quantity_to_purchase
                 # print(f'''Barrel added to purchase plan: \n sku: {barrel.sku} \n ml_per_barrel: {barrel.ml_per_barrel} \n potion_type: {barrel.potion_type} \n price: {barrel.price} \n quantity: {res[barrel.sku]["quantity"]}''')
         if not barrel_purchased:
             break
@@ -162,16 +169,18 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
         barrel_purchased = False
         for barrel in dark_catalog:
             if barrel.price <= darkbudget and barrel.quantity > 0:
+                max_purchase_by_budget = darkbudget // barrel.price
+                quantity_to_purchase = min(max_purchase_by_budget, barrel.quantity)
                 if barrel.sku in res:
-                    res[barrel.sku]["quantity"] += 1
+                    res[barrel.sku]["quantity"] += quantity_to_purchase
                 else:
                     res[barrel.sku] = {
                         "sku": barrel.sku,
-                        "quantity": 1
+                        "quantity": quantity_to_purchase
                     }
                 barrel_purchased = True
-                darkbudget -= barrel.price
-                barrel.quantity -= 1
+                darkbudget -= barrel.price * quantity_to_purchase
+                barrel.quantity -= quantity_to_purchase
                 # print(f'''Barrel added to purchase plan: \n sku: {barrel.sku} \n ml_per_barrel: {barrel.ml_per_barrel} \n potion_type: {barrel.potion_type} \n price: {barrel.price} \n quantity: {res[barrel.sku]["quantity"]}''')
         if not barrel_purchased:
             break
