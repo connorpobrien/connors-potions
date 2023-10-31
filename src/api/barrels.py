@@ -83,6 +83,8 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     blue_catalog = sorted([b for b in wholesale_catalog if b.potion_type == [0, 0, 1, 0]], key=lambda x: x.ml_per_barrel / x.price, reverse=True)
     dark_catalog = sorted([b for b in wholesale_catalog if b.potion_type == [0, 0, 0, 1]], key=lambda x: x.ml_per_barrel / x.price, reverse=True)
 
+    print(len(red_catalog), len(green_catalog), len(blue_catalog), len(dark_catalog))
+
 
     # determine budget for each type
     redbudget = greenbudget = bluebudget = darkbudget = 0
@@ -186,4 +188,4 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
             break
 
     print(res.values())
-    return list(res.values())
+    return list(res.values()) if len(res) > 0 else []
