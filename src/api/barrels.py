@@ -110,6 +110,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
             greenbudget += darkbudget
         else:
             bluebudget += darkbudget
+        darkbudget = 0
 
     print(f'''Budgets: \n redbudget: {redbudget} \n greenbudget: {greenbudget} \n bluebudget: {bluebudget} \n darkbudget: {darkbudget}''')
 
