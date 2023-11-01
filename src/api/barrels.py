@@ -4,6 +4,7 @@ from src.api import auth
 import sqlalchemy
 from src import database as db
 import json
+import random
 
 
 router = APIRouter(
@@ -98,6 +99,17 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     else:
         split = gold//4
         redbudget, greenbudget, bluebudget, darkbudget = split, split, split, split
+
+    # if len dark catalog is 0 and darkbudget is greater than 0, then
+    # choose a random number 1-3 and assign the gold from darkbudget to either red, green or blue
+    if len(dark_catalog) == 0 and darkbudget > 0:
+        random_num = random.randint(1, 3)
+        if random_num == 1:
+            redbudget += darkbudget
+        elif random_num == 2:
+            greenbudget += darkbudget
+        else:
+            bluebudget += darkbudget
 
     print(f'''Budgets: \n redbudget: {redbudget} \n greenbudget: {greenbudget} \n bluebudget: {bluebudget} \n darkbudget: {darkbudget}''')
 
