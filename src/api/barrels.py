@@ -117,8 +117,8 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
             bluebudget += darkbudget
         darkbudget = 0
 
-    # if current num_ml is above 100k, give majority budget to dark_ml
-    if total_ml > 100000:
+    # if current non_dark ml is above 100k, give majority budget to dark_ml
+    if total_ml - dark_ml > 75000:
         redbudget, greenbudget, bluebudget = 0, 0, 0
         if gold > 10000:
             darkbudget = 10000
