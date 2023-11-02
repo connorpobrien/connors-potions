@@ -112,8 +112,10 @@ def get_bottle_plan():
         for item in catalog:
             sku, name, price, red_ml, green_ml, blue_ml, dark_ml, quantity = item
             # if possible
-            if (inventory_red_ml >= red_ml) and (inventory_green_ml >= green_ml) and (inventory_blue_ml >= blue_ml) and (inventory_dark_ml >= dark_ml) and len(bottle_plan) < 6:
+            if (inventory_red_ml >= red_ml) and (inventory_green_ml >= green_ml) and (inventory_blue_ml >= blue_ml) and (inventory_dark_ml >= dark_ml):
                 potion_type = (red_ml, green_ml, blue_ml, dark_ml)
+                if potion_type not in bottle_plan and len(bottle_plan) == 6:
+                    continue
                 if potion_type in bottle_plan:
                     bottle_plan[potion_type]["quantity"] += 1
                 else:
