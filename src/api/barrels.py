@@ -74,9 +74,14 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     print(wholesale_catalog)
 
     with db.engine.begin() as connection:
-        # Get gold from inventory_ledger
+         # Get gold, red_ml, green_ml, blue_ml, dark_ml from inventory_ledger
         inventory_ledger_query = """SELECT SUM(change) AS total FROM inventory_ledger WHERE type = :type"""
         gold = connection.execute(sqlalchemy.text(inventory_ledger_query), {"type": "gold"}).first()[0] or 0
+        red_ml = connection.execute(sqlalchemy.text(inventory_ledger_query), {"type": "red_ml"}).first()[0] or 0
+        green_ml = connection.execute(sqlalchemy.text(inventory_ledger_query), {"type": "green_ml"}).first()[0] or 0
+        blue_ml = connection.execute(sqlalchemy.text(inventory_ledger_query), {"type": "blue_ml"}).first()[0] or 0
+        dark_ml = connection.execute(sqlalchemy.text(inventory_ledger_query), {"type": "dark_ml"}).first()[0] or 0
+        total_ml = red_ml + green_ml + blue_ml + dark_ml
 
     # sort catalog by color
     red_catalog = sorted([b for b in wholesale_catalog if b.potion_type == [1, 0, 0, 0]], key=lambda x: x.ml_per_barrel / x.price, reverse=True)
@@ -111,6 +116,12 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
         else:
             bluebudget += darkbudget
         darkbudget = 0
+
+    # if current num_ml is above 100k, give majority budget to dark_ml
+    if total_ml > 100000:
+        red_ml = green_ml = blue_ml = 0
+        darkbudget = gold // 2
+
 
     print(f'''Budgets: \n redbudget: {redbudget} \n greenbudget: {greenbudget} \n bluebudget: {bluebudget} \n darkbudget: {darkbudget}''')
 

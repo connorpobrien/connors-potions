@@ -119,13 +119,15 @@ def get_bottle_plan():
                 # define potion type
                 potion_type = (red_ml, green_ml, blue_ml, dark_ml)
 
-                # if potion type is already in bottle plan or there are already 6
+                # if potion type is not in bottle plan and there are already 6 types of potions, skip
                 if potion_type not in bottle_plan and len(bottle_plan) == 6:
                     continue
 
+                # increment
                 if potion_type in bottle_plan:
                     bottle_plan[potion_type]["quantity"] += 1
 
+                # initialize
                 else:
                     bottle_plan[potion_type] = {"potion_type": potion_type, "quantity": 1}
                     
@@ -138,7 +140,7 @@ def get_bottle_plan():
 
                 # increase total potions
                 total_potions += 1
-                
+
             if total_potions == 300:
                 break
         if not create_potion:
