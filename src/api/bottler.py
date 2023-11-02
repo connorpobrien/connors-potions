@@ -110,14 +110,22 @@ def get_bottle_plan():
         
         # make potions
         for item in catalog:
+            # get attributes
             sku, name, price, red_ml, green_ml, blue_ml, dark_ml, quantity = item
-            # if possible
+
+            # if there are enough ml
             if (inventory_red_ml >= red_ml) and (inventory_green_ml >= green_ml) and (inventory_blue_ml >= blue_ml) and (inventory_dark_ml >= dark_ml):
+
+                # define potion type
                 potion_type = (red_ml, green_ml, blue_ml, dark_ml)
+
+                # if potion type is already in bottle plan or there are already 6
                 if potion_type not in bottle_plan and len(bottle_plan) == 6:
                     continue
+
                 if potion_type in bottle_plan:
                     bottle_plan[potion_type]["quantity"] += 1
+
                 else:
                     bottle_plan[potion_type] = {"potion_type": potion_type, "quantity": 1}
                     
@@ -130,8 +138,7 @@ def get_bottle_plan():
 
                 # increase total potions
                 total_potions += 1
-            if len(bottle_plan) == 6:
-                break
+                
             if total_potions == 300:
                 break
         if not create_potion:
