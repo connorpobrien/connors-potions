@@ -102,8 +102,12 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
         split = gold//3
         redbudget, greenbudget, bluebudget = split, split, split
     else:
-        split = gold//4
-        redbudget, greenbudget, bluebudget, darkbudget = split, split, split, split
+        if gold > 8000:
+            split = 8000//4
+            redbudget, greenbudget, bluebudget, darkbudget = split, split, split, split
+        else:
+            split = gold//4
+            redbudget, greenbudget, bluebudget, darkbudget = split, split, split, split
 
     # if len dark catalog is 0 and darkbudget is greater than 0, then
     # choose a random number 1-3 and assign the gold from darkbudget to either red, green or blue
@@ -118,7 +122,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
         darkbudget = 0
 
     # if current non_dark ml is above 100k, give majority budget to dark_ml
-    if total_ml - dark_ml > 76000:
+    if total_ml - dark_ml > 80000:
         redbudget, greenbudget, bluebudget = 0, 0, 0
         if gold > 10000:
             darkbudget = 10000
