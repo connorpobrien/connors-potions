@@ -90,6 +90,8 @@ def get_bottle_plan():
                                     sku) AS ledger
                             ON 
                                 catalog.sku = ledger.sku
+                            WHERE 
+                                catalog.sku IN ('100_0_0_0', '0_100_0_0', '0_0_100_0', '0_0_0_100', '50_50_0_0', '50_0_50_0', '50_0_0_50', '0_50_0_50', '0_0_50_50', '50_25_25_0', '25_50_25_0', '25_25_50_0')
                         """
         catalog = connection.execute(sqlalchemy.text(combined_query)).fetchall()
 
