@@ -44,9 +44,10 @@ def get_catalog():
             sku, name, price, red_ml, green_ml, blue_ml, dark_ml, quantity = item
             if item.quantity > 0:
                 res.append({"sku": item.sku, "name": item.name, "quantity": item.quantity, "price": item.price, "potion_type": [item.red_ml, item.green_ml, item.blue_ml, item.dark_ml]})
-                print(f'''Item in catalog: \n sku: {item.sku} \n name: {item.name} \n quantity: {item.quantity} \n price: {item.price} \n potion_type: {item.red_ml, item.green_ml, item.blue_ml, item.dark_ml}''')
 
         # sort res by quantity max-> min, return top 6
         res.sort(key=lambda x: x["quantity"], reverse=True)
+        print("CATALOG")
+        print(res)
         return res[:6]
 
