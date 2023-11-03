@@ -48,5 +48,5 @@ def get_catalog():
 
         # sort res by quantity max-> min, return top 6
         res.sort(key=lambda x: x["quantity"], reverse=True)
-        res = res[:6]
-        
+        return res[:6]
+
