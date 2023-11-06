@@ -121,14 +121,6 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
             bluebudget += darkbudget
         darkbudget = 0
 
-    # if current non_dark ml is above 60k, give majority budget to dark_ml
-    if total_ml - dark_ml > 60000:
-        redbudget, greenbudget, bluebudget = 0, 0, 0
-        if gold > 6000:
-            darkbudget = 6000
-        else:
-            darkbudget = gold
-
 
     print(f'''Budgets: \n redbudget: {redbudget} \n greenbudget: {greenbudget} \n bluebudget: {bluebudget} \n darkbudget: {darkbudget}''')
 
@@ -138,7 +130,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     while True:
         barrel_purchased = False
         for barrel in red_catalog:
-            if barrel.price <= redbudget and barrel.quantity > 0:
+            if barrel.price <= redbudget and barrel.quantity > 0 and (barrel.price // barrel.ml_per_barrel) >= 0.1:
                 max_purchase_by_budget = redbudget // barrel.price
                 quantity_to_purchase = min(max_purchase_by_budget, barrel.quantity)
                 if barrel.sku in res:
@@ -159,7 +151,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     while True:
         barrel_purchased = False
         for barrel in green_catalog:
-            if barrel.price <= greenbudget and barrel.quantity > 0:
+            if barrel.price <= greenbudget and barrel.quantity > 0 and (barrel.price // barrel.ml_per_barrel) >= 0.1:
                 max_purchase_by_budget = greenbudget // barrel.price
                 quantity_to_purchase = min(max_purchase_by_budget, barrel.quantity)
                 if barrel.sku in res:
@@ -180,7 +172,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     while True:
         barrel_purchased = False
         for barrel in blue_catalog:
-            if barrel.price <= bluebudget and barrel.quantity > 0:
+            if barrel.price <= bluebudget and barrel.quantity > 0 and (barrel.price // barrel.ml_per_barrel) >= 0.1:
                 max_purchase_by_budget = bluebudget // barrel.price
                 quantity_to_purchase = min(max_purchase_by_budget, barrel.quantity)
                 if barrel.sku in res:
@@ -201,7 +193,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     while True:
         barrel_purchased = False
         for barrel in dark_catalog:
-            if barrel.price <= darkbudget and barrel.quantity > 0:
+            if barrel.price <= darkbudget and barrel.quantity > 0 and (barrel.price // barrel.ml_per_barrel) >= 0.1:
                 max_purchase_by_budget = darkbudget // barrel.price
                 quantity_to_purchase = min(max_purchase_by_budget, barrel.quantity)
                 if barrel.sku in res:
