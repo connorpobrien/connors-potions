@@ -46,7 +46,7 @@ def get_catalog():
                 res.append({"sku": item.sku, "name": item.name, "quantity": item.quantity, "price": item.price, "potion_type": [item.red_ml, item.green_ml, item.blue_ml, item.dark_ml]})
 
         # sort res by quantity max-> min, return top 6
-        res.sort(key=lambda x: x["quantity"])
+        res.sort(key=lambda x: x["quantity"], reverse=True)
         print("CATALOG")
         print(res)
         return res[:6]
