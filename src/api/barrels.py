@@ -126,7 +126,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     while True:
         barrel_purchased = False
         for barrel in red_catalog:
-            if barrel.price <= redbudget and barrel.quantity > 0 and (barrel.price // barrel.ml_per_barrel) >= 0.1:
+            if barrel.price <= redbudget and barrel.quantity > 0 and (barrel.price / barrel.ml_per_barrel) <= 0.12:
                 max_purchase_by_budget = redbudget // barrel.price
                 quantity_to_purchase = min(max_purchase_by_budget, barrel.quantity)
                 if barrel.sku in res:
@@ -147,7 +147,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     while True:
         barrel_purchased = False
         for barrel in green_catalog:
-            if barrel.price <= greenbudget and barrel.quantity > 0 and (barrel.price // barrel.ml_per_barrel) >= 0.1:
+            if barrel.price <= greenbudget and barrel.quantity > 0 and (barrel.price / barrel.ml_per_barrel) <= 0.12:
                 max_purchase_by_budget = greenbudget // barrel.price
                 quantity_to_purchase = min(max_purchase_by_budget, barrel.quantity)
                 if barrel.sku in res:
@@ -168,7 +168,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     while True:
         barrel_purchased = False
         for barrel in blue_catalog:
-            if barrel.price <= bluebudget and barrel.quantity > 0 and (barrel.price // barrel.ml_per_barrel) >= 0.1:
+            if barrel.price <= bluebudget and barrel.quantity > 0 and (barrel.price / barrel.ml_per_barrel) <= 0.12:
                 max_purchase_by_budget = bluebudget // barrel.price
                 quantity_to_purchase = min(max_purchase_by_budget, barrel.quantity)
                 if barrel.sku in res:
@@ -189,7 +189,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     while True:
         barrel_purchased = False
         for barrel in dark_catalog:
-            if barrel.price <= darkbudget and barrel.quantity > 0 and (barrel.price // barrel.ml_per_barrel) >= 0.1:
+            if barrel.price <= darkbudget and barrel.quantity > 0 and (barrel.price / barrel.ml_per_barrel) <= 0.12:
                 max_purchase_by_budget = darkbudget // barrel.price
                 quantity_to_purchase = min(max_purchase_by_budget, barrel.quantity)
                 if barrel.sku in res:
