@@ -102,7 +102,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
         split = gold//3
         redbudget, greenbudget, bluebudget = split, split, split
     else:
-        split = gold//4
+        split = max(gold//4, 20000)
         redbudget, greenbudget, bluebudget, darkbudget = split, split, split, split
 
     # if len dark catalog is 0 and darkbudget is greater than 0, then
