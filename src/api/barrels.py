@@ -83,6 +83,9 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
         dark_ml = connection.execute(sqlalchemy.text(inventory_ledger_query), {"type": "dark_ml"}).first()[0] or 0
         total_ml = red_ml + green_ml + blue_ml + dark_ml
 
+    if total_ml > 50000:
+        return []
+
     # sort catalog by color
     red_catalog = sorted([b for b in wholesale_catalog if b.potion_type == [1, 0, 0, 0]], key=lambda x: x.ml_per_barrel / x.price, reverse=True)
     green_catalog = sorted([b for b in wholesale_catalog if b.potion_type == [0, 1, 0, 0]], key=lambda x: x.ml_per_barrel / x.price, reverse=True)
